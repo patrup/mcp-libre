@@ -4,7 +4,7 @@ This guide explains how to use the LibreOffice MCP server with the Super Assista
 
 ## Prerequisites
 
-1. **LibreOffice MCP Server** (already set up in `/home/patrick/work/mcp/mcp-libre/`)
+1. **LibreOffice MCP Server** (already set up in `<PATH_TO>/mcp-libre/`)
 2. **Super Assistant Chrome Extension** (installed in Chrome)
 3. **MCP Proxy** (using `@srbhptl39/mcp-superassistant-proxy`)
 4. **Node.js/NPX** (for running the proxy)
@@ -29,11 +29,11 @@ The configuration file has been updated to include both Blender and LibreOffice 
         	"args": [
             	"run",
             	"python",
-            	"/home/patrick/work/mcp/mcp-libre/main.py"
+            	"<PATH_TO>/mcp-libre/main.py"
         	],
-        	"cwd": "/home/patrick/work/mcp/mcp-libre",
+        	"cwd": "<PATH_TO>/mcp-libre",
         	"env": {
-            	"PYTHONPATH": "/home/patrick/work/mcp/mcp-libre"
+            	"PYTHONPATH": "<PATH_TO>/mcp-libre"
         	}
     	}
 	}
@@ -160,7 +160,7 @@ Add environment variables to the MCP configuration for specific setups:
 
 ```json
 "env": {
-    "PYTHONPATH": "/home/patrick/work/mcp/mcp-libre",
+    "PYTHONPATH": "<PATH_TO>/mcp-libre",
     "LIBREOFFICE_PATH": "/usr/bin/libreoffice",
     "TEMP_DIR": "/tmp/mcp_libre"
 }
@@ -200,7 +200,7 @@ Using the LibreOffice MCP server through Super Assistant provides:
 
 - **LibreOffice Documentation**: https://help.libreoffice.org/
 - **MCP Specification**: https://spec.modelcontextprotocol.io/
-- **Project Repository**: `/home/patrick/work/mcp/mcp-libre/`
+- **Project Repository**: `<PATH_TO>/mcp-libre/`
 - **Test Examples**: See `EXAMPLES.md` in the project directory
 
 ## Next Steps

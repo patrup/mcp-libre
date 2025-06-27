@@ -91,7 +91,7 @@ mcp-libre/
 
 ### Installation Commands
 ```bash
-cd /home/patrick/work/mcp/mcp-libre
+cd <PATH_TO>/mcp-libre
 uv sync                    # Install dependencies
 chmod +x mcp-helper.sh     # Make helper script executable
 ```
@@ -112,10 +112,10 @@ Configuration file: `claude_config.json`
   "mcpServers": {
     "libreoffice": {
       "command": "uv",
-      "args": ["run", "python", "/home/patrick/work/mcp/mcp-libre/main.py"],
-      "cwd": "/home/patrick/work/mcp/mcp-libre",
+      "args": ["run", "python", "<PATH_TO>/mcp-libre/main.py"],
+      "cwd": "<PATH_TO>/mcp-libre",
       "env": {
-        "PYTHONPATH": "/home/patrick/work/mcp/mcp-libre"
+        "PYTHONPATH": "<PATH_TO>/mcp-libre"
       }
     }
   }
@@ -211,7 +211,7 @@ result = convert_document(
 
 ### Environment Variables
 ```bash
-PYTHONPATH="/home/patrick/work/mcp/mcp-libre"
+PYTHONPATH="<PATH_TO>/mcp-libre"
 LIBREOFFICE_PATH="/usr/bin/libreoffice"  # Optional custom path
 TEMP_DIR="/tmp/mcp_libre"                # Optional temp directory
 ```
@@ -294,7 +294,7 @@ The server is now ready for production use with AI assistants, automation script
 
 ## 📞 Support & Resources
 
-- **Project Directory**: `/home/patrick/work/mcp/mcp-libre/`
+- **Project Directory**: `<PATH_TO>/mcp-libre/`
 - **Configuration**: `/home/patrick/Documents/mcp/mcp.config.json`
 - **Helper Script**: `./mcp-helper.sh`
 - **Documentation**: See README.md, EXAMPLES.md, and setup guides

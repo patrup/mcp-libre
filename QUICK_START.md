@@ -4,17 +4,17 @@
 
 1. **Check if everything is ready:**
    ```bash
-   /home/patrick/work/mcp/mcp-libre/mcp-helper.sh check
+   <PATH_TO>/mcp-libre/mcp-helper.sh check
    ```
 
 2. **Test the LibreOffice MCP server:**
    ```bash
-   /home/patrick/work/mcp/mcp-libre/mcp-helper.sh test
+   <PATH_TO>/mcp-libre/mcp-helper.sh test
    ```
 
 3. **Start the MCP proxy for Super Assistant:**
    ```bash
-   /home/patrick/work/mcp/mcp-libre/mcp-helper.sh proxy
+   <PATH_TO>/mcp-libre/mcp-helper.sh proxy
    ```
 
 ## Super Assistant Extension Configuration
@@ -109,8 +109,8 @@ libreoffice --headless --help
 
 ## Need Help?
 
-- **Run Demo**: `/home/patrick/work/mcp/mcp-libre/mcp-helper.sh demo`
-- **View Config**: `/home/patrick/work/mcp/mcp-libre/mcp-helper.sh config`
+- **Run Demo**: `<PATH_TO>/mcp-libre/mcp-helper.sh demo`
+- **View Config**: `<PATH_TO>/mcp-libre/mcp-helper.sh config`
 - **Full Documentation**: See `SUPER_ASSISTANT_SETUP.md`
 
 ---

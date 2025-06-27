@@ -130,7 +130,7 @@ Error: source file could not be loaded
    cat ~/.config/claude/claude_desktop_config.json
    
    # Verify the server path is correct
-   ls -la /home/patrick/work/mcp/mcp-libre/main.py
+   ls -la <PATH_TO>/mcp-libre/main.py
    ```
 
 2. **For Super Assistant**:
@@ -184,7 +184,7 @@ To get more detailed error information:
 
 1. **Run server with debug output**:
    ```bash
-   PYTHONPATH=/home/patrick/work/mcp/mcp-libre uv run python main.py --verbose
+   PYTHONPATH=<PATH_TO>/mcp-libre uv run python main.py --verbose
    ```
 
 2. **Check LibreOffice directly**:
