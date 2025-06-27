@@ -266,6 +266,51 @@ show_requirements() {
     echo ""
 }
 
+show_info() {
+    print_header
+    echo "LibreOffice MCP Server - Project Information"
+    echo ""
+    
+    echo -e "${BLUE}Project Details:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "• Name: LibreOffice MCP Server (mcp-libre)"
+    echo "• Version: 0.1.0"
+    echo "• License: MIT License"
+    echo "• Purpose: Model Context Protocol server for LibreOffice document processing"
+    echo ""
+    
+    echo -e "${GREEN}Key Features:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "• Document Creation & Editing (Writer, Calc, Impress, Draw)"
+    echo "• Format Conversion (50+ formats including PDF, DOCX, HTML)"
+    echo "• Content Extraction & Analysis"
+    echo "• Batch Operations & Document Search"
+    echo "• AI Assistant Integration (Claude Desktop, Super Assistant)"
+    echo ""
+    
+    echo -e "${YELLOW}License Information:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "• License Type: MIT License (Permissive)"
+    echo "• Commercial Use: ✅ Allowed"
+    echo "• Modification: ✅ Allowed"
+    echo "• Distribution: ✅ Allowed"
+    echo "• Private Use: ✅ Allowed"
+    echo ""
+    echo "For full license text, see: LICENSE"
+    echo "For other license options, see: LICENSE_OPTIONS.md"
+    echo ""
+    
+    echo -e "${BLUE}File Structure:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "• libremcp.py - Main MCP server implementation"
+    echo "• main.py - Entry point script"
+    echo "• test_client.py - Test client for validation"
+    echo "• mcp-helper.sh - Management and testing helper"
+    echo "• pyproject.toml - Project configuration"
+    echo "• Documentation: README.md, EXAMPLES.md, etc."
+    echo ""
+}
+
 show_config() {
     echo "Current MCP configuration:"
     echo "Config file: $MCP_CONFIG_PATH"
@@ -289,6 +334,7 @@ show_help() {
     echo "  demo         Run interactive demo of MCP capabilities"
     echo "  proxy        Start the MCP proxy for Super Assistant"
     echo "  config       Show current MCP configuration"
+    echo "  info         Show project information and license details"
     echo "  help         Show this help message"
     echo ""
     echo "Examples:"
@@ -330,6 +376,9 @@ case "${1:-help}" in
         ;;
     "config")
         show_config
+        ;;
+    "info"|"information")
+        show_info
         ;;
     "help"|"--help"|"-h")
         show_help
