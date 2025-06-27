@@ -1,232 +1,250 @@
 # LibreOffice MCP Server
 
-A Model Context Protocol (MCP) server that provides tools and resources for interacting with LibreOffice documents. This server enables AI assistants and other MCP clients to read, write, convert, and manipulate LibreOffice documents programmatically.
+A comprehensive Model Context Protocol (MCP) server that provides tools and resources for interacting with LibreOffice documents. This server enables AI assistants and other MCP clients to create, read, convert, and manipulate LibreOffice documents programmatically.
 
-## Features
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![LibreOffice](https://img.shields.io/badge/LibreOffice-24.2+-green.svg)](https://www.libreoffice.org/)
+[![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-orange.svg)](https://spec.modelcontextprotocol.io/)
+
+## 🚀 Features
 
 ### Document Operations
-- **Create Documents**: Create new Writer, Calc, Impress, or Draw documents
-- **Read Content**: Extract text content from any LibreOffice document
-- **Convert Formats**: Convert between different document formats (PDF, DOCX, TXT, etc.)
+- **Create Documents**: New Writer, Calc, Impress, and Draw documents
+- **Read Content**: Extract text from any LibreOffice document
+- **Convert Formats**: Convert between 50+ formats (PDF, DOCX, HTML, etc.)
 - **Edit Documents**: Insert, append, or replace text in Writer documents
 - **Document Info**: Get detailed metadata about documents
 
 ### Spreadsheet Operations
 - **Read Spreadsheets**: Extract data from Calc spreadsheets and Excel files
-- **Data Export**: Convert spreadsheet data to structured formats
+- **Structured Data**: Get data as 2D arrays with row/column information
 
-### Batch Operations
-- **Batch Convert**: Convert multiple documents in a directory
-- **Search Documents**: Find documents containing specific text
+### Advanced Tools
+- **Document Search**: Find documents containing specific text
+- **Batch Convert**: Convert multiple documents simultaneously
 - **Merge Documents**: Combine multiple documents into one
-- **Document Statistics**: Get detailed analytics about document content
+- **Document Analysis**: Get detailed statistics (word count, sentences, etc.)
 
-### Resources
-- **Document Discovery**: List all LibreOffice documents in common locations
-- **Document Content**: Access document content through MCP resources
+### MCP Resources
+- **Document Discovery**: List all LibreOffice documents (`documents://`)
+- **Content Access**: Access specific document content (`document://{path}`)
 
-## Prerequisites
+## 📋 Requirements
 
-- **LibreOffice**: Must be installed and accessible via command line
-  - On Ubuntu/Debian: `sudo apt install libreoffice`
-  - On macOS: Install from [LibreOffice website](https://www.libreoffice.org/download/download/)
-  - On Windows: Install from [LibreOffice website](https://www.libreoffice.org/download/download/)
+- **LibreOffice**: 24.2+ (must be accessible via command line)
+- **Python**: 3.12+
+- **UV Package Manager**: For dependency management
 
-- **Python 3.12+**
+## 🛠 Installation
 
-## Installation
-
-1. Clone or download this repository
-2. Install dependencies:
+1. **Clone the repository**:
    ```bash
-   uv install
-   # or
-   pip install -e .
+   git clone <repository-url>
+   cd mcp-libre
    ```
 
-## Usage
+2. **Install dependencies**:
+   ```bash
+   uv sync
+   ```
 
-### Running the MCP Server
+3. **Make helper script executable**:
+   ```bash
+   chmod +x mcp-helper.sh
+   ```
 
-The server can be run in different modes:
+4. **Verify installation**:
+   ```bash
+   ./mcp-helper.sh check
+   ```
 
-#### Standard MCP Server (stdio transport)
+## 🎯 Quick Start
+
+### Test the Server
 ```bash
+# Run functionality tests
+./mcp-helper.sh test
+
+# Run interactive demo
+./mcp-helper.sh demo
+```
+
+### Start MCP Server
+```bash
+# Standard MCP mode (stdio)
 python main.py
-# or
-mcp-libre
+
+# Or using UV
+uv run python main.py
 ```
 
-#### Test Mode
+### Integration with Super Assistant
 ```bash
-python main.py --test
-# or
-python libremcp.py --test
+# Start the MCP proxy
+./mcp-helper.sh proxy
+
+# Then configure Super Assistant extension:
+# Server URL: http://localhost:3000
 ```
 
-### Integration with Claude Desktop
+## 🔧 Available Tools
 
-Add this configuration to your Claude Desktop config file:
+| Tool | Description |
+|------|-------------|
+| `create_document` | Create new LibreOffice documents |
+| `read_document_text` | Extract text from documents |
+| `convert_document` | Convert between formats |
+| `get_document_info` | Get document metadata |
+| `read_spreadsheet_data` | Read spreadsheet data |
+| `insert_text_at_position` | Edit document text |
+| `search_documents` | Search documents by content |
+| `batch_convert_documents` | Batch format conversion |
+| `merge_text_documents` | Merge multiple documents |
+| `get_document_statistics` | Document analysis |
 
+## 📚 Documentation
+
+- **[Examples](EXAMPLES.md)**: Code examples and usage patterns
+- **[Super Assistant Setup](SUPER_ASSISTANT_SETUP.md)**: Chrome extension integration
+- **[Quick Start](QUICK_START.md)**: Quick reference guide
+- **[Complete Solution](COMPLETE_SOLUTION.md)**: Comprehensive overview
+
+## 🔗 Integration Options
+
+### 1. Claude Desktop
 ```json
 {
   "mcpServers": {
     "libreoffice": {
-      "command": "python",
-      "args": ["/path/to/mcp-libre/main.py"],
-      "env": {}
+      "command": "uv",
+      "args": ["run", "python", "/path/to/mcp-libre/main.py"],
+      "cwd": "/path/to/mcp-libre"
     }
   }
 }
 ```
 
-## Available Tools
+### 2. Super Assistant Chrome Extension
+```bash
+npx @srbhptl39/mcp-superassistant-proxy@latest --config /path/to/mcp.config.json
+```
 
-### Core Document Tools
-
-#### `create_document(path, doc_type, content)`
-Create a new LibreOffice document.
-- `path`: Full path where document should be created
-- `doc_type`: "writer", "calc", "impress", or "draw"
-- `content`: Initial text content (for Writer documents)
-
-#### `read_document_text(path)`
-Extract text content from any LibreOffice document.
-- `path`: Path to the document file
-
-#### `convert_document(source_path, target_path, target_format)`
-Convert a document to a different format.
-- `source_path`: Path to source document
-- `target_path`: Path for converted document
-- `target_format`: Target format (pdf, docx, txt, html, etc.)
-
-#### `get_document_info(path)`
-Get detailed information about a document file.
-- `path`: Path to the document
-
-#### `insert_text_at_position(path, text, position)`
-Insert text into a Writer document.
-- `path`: Path to the document
-- `text`: Text to insert
-- `position`: "start", "end", or "replace"
-
-### Spreadsheet Tools
-
-#### `read_spreadsheet_data(path, sheet_name, max_rows)`
-Read data from a spreadsheet.
-- `path`: Path to spreadsheet file
-- `sheet_name`: Specific sheet name (optional)
-- `max_rows`: Maximum rows to read (default: 100)
-
-### Utility Tools
-
-#### `search_documents(query, search_path)`
-Search for documents containing specific text.
-- `query`: Text to search for
-- `search_path`: Directory to search (optional)
-
-#### `batch_convert_documents(source_dir, target_dir, target_format, source_extensions)`
-Convert multiple documents in batch.
-- `source_dir`: Source directory
-- `target_dir`: Target directory
-- `target_format`: Target format
-- `source_extensions`: File extensions to convert (optional)
-
-#### `merge_text_documents(document_paths, output_path, separator)`
-Merge multiple documents into one.
-- `document_paths`: List of document paths
-- `output_path`: Output file path
-- `separator`: Text between merged documents
-
-#### `get_document_statistics(path)`
-Get detailed statistics about a document.
-- `path`: Path to the document
-
-## Available Resources
-
-### `documents://`
-Lists all LibreOffice documents in common locations (Documents, Desktop, current directory).
-
-### `document://{path}`
-Get the text content of a specific document by path.
-
-## Supported File Formats
-
-### Input Formats
-- LibreOffice: `.odt`, `.ods`, `.odp`, `.odg`
-- Microsoft Office: `.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx`
-- Text: `.txt`, `.rtf`
-- And many others supported by LibreOffice
-
-### Output Formats
-- PDF: `.pdf`
-- Microsoft Office: `.docx`, `.xlsx`, `.pptx`
-- HTML: `.html`
-- Text: `.txt`
-- OpenDocument: `.odt`, `.ods`, `.odp`, `.odg`
-- And many others supported by LibreOffice
-
-## Examples
-
-### Creating and Editing a Document
+### 3. Direct MCP Client
 ```python
-# Create a new Writer document
-doc_info = create_document("/tmp/my_document.odt", "writer", "Hello, World!")
+from mcp.shared.memory import create_connected_server_and_client_session
+from libremcp import mcp
 
-# Add more content
-doc_info = insert_text_at_position("/tmp/my_document.odt", "\n\nThis is additional content.", "end")
+async with client_session(mcp._mcp_server) as client:
+    result = await client.call_tool("create_document", {
+        "path": "/tmp/test.odt",
+        "doc_type": "writer",
+        "content": "Hello, World!"
+    })
+```
+
+## 🎨 Usage Examples
+
+### Natural Language (via Super Assistant)
+- *"Create a new Writer document with a project report"*
+- *"Convert my ODT file to PDF format"*
+- *"Search for documents containing 'budget' in my Documents folder"*
+- *"Get statistics for my essay - how many words?"*
+
+### Programmatic Usage
+```python
+from libremcp import create_document, read_document_text, convert_document
+
+# Create a document
+doc = create_document("/tmp/report.odt", "writer", "Project Report")
+
+# Read content
+content = read_document_text("/tmp/report.odt")
+print(f"Words: {content.word_count}")
 
 # Convert to PDF
-result = convert_document("/tmp/my_document.odt", "/tmp/my_document.pdf", "pdf")
+result = convert_document("/tmp/report.odt", "/tmp/report.pdf", "pdf")
 ```
 
-### Reading and Analyzing Documents
-```python
-# Read document content
-content = read_document_text("/path/to/document.odt")
-print(f"Words: {content.word_count}, Characters: {content.char_count}")
+## 📁 Supported File Formats
 
-# Get detailed statistics
-stats = get_document_statistics("/path/to/document.odt")
-print(f"Sentences: {stats['content_stats']['sentence_count']}")
-```
+### Input (Reading)
+- **LibreOffice**: `.odt`, `.ods`, `.odp`, `.odg`
+- **Microsoft Office**: `.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx`
+- **Text**: `.txt`, `.rtf`
 
-### Working with Spreadsheets
-```python
-# Read spreadsheet data
-data = read_spreadsheet_data("/path/to/spreadsheet.ods", max_rows=50)
-print(f"Sheet: {data.sheet_name}, Rows: {data.row_count}, Cols: {data.col_count}")
-```
+### Output (Conversion)
+- **PDF**: `.pdf`
+- **Microsoft Office**: `.docx`, `.xlsx`, `.pptx`
+- **Web**: `.html`, `.htm`
+- **Text**: `.txt`
+- **LibreOffice**: `.odt`, `.ods`, `.odp`, `.odg`
+- **Many others**: 50+ formats supported by LibreOffice
 
-## Error Handling
+## 🧪 Testing
 
-The server includes comprehensive error handling for common scenarios:
-- Missing LibreOffice installation
-- File not found errors
-- Unsupported file formats
-- Conversion failures
-- Permission issues
-
-All errors are returned as structured responses with descriptive error messages.
-
-## Development
-
-### Running Tests
 ```bash
-python main.py --test
+# Check dependencies
+./mcp-helper.sh check
+
+# Run built-in tests
+./mcp-helper.sh test
+
+# Interactive demo
+./mcp-helper.sh demo
+
+# Test specific functionality
+uv run python libremcp.py --test
 ```
 
-### Project Structure
-```
-mcp-libre/
-├── libremcp.py          # Main MCP server implementation
-├── main.py              # Entry point
-├── pyproject.toml       # Project configuration
-├── README.md            # This file
-└── uv.lock             # Dependency lock file
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+export PYTHONPATH="/path/to/mcp-libre"
+export LIBREOFFICE_PATH="/usr/bin/libreoffice"  # Optional
 ```
 
-## Contributing
+### Custom Search Paths
+Edit `libremcp.py` to modify document discovery locations:
+```python
+search_paths = [
+    Path.home() / "Documents",
+    Path.home() / "Desktop",
+    Path("/custom/path"),
+    Path.cwd()
+]
+```
+
+## 🛡 Security
+
+- **Local Execution**: All operations run locally
+- **File Permissions**: Limited to user's file access
+- **No Network**: No external network dependencies
+- **Temporary Files**: Automatically cleaned up
+
+## 🚨 Troubleshooting
+
+### LibreOffice Issues
+```bash
+# Check LibreOffice installation
+libreoffice --version
+libreoffice --headless --help
+
+# Test conversion manually
+libreoffice --headless --convert-to pdf document.odt
+```
+
+### Java Warnings
+- Java warnings are usually non-fatal
+- Core functionality works without Java
+- Install Java for full LibreOffice features
+
+### Permission Errors
+- Check file and directory permissions
+- Ensure LibreOffice can access document paths
+- Verify write permissions for output directories
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -234,33 +252,22 @@ mcp-libre/
 4. Add tests if applicable
 5. Submit a pull request
 
-## License
+## 📄 License
 
 This project is open source. Please check the license file for details.
 
-## Troubleshooting
+## 🔗 Links
 
-### LibreOffice Not Found
-If you get "LibreOffice executable not found" errors:
-1. Ensure LibreOffice is installed
-2. Verify it's in your system PATH
-3. Try running `libreoffice --version` in terminal
+- **MCP Specification**: https://spec.modelcontextprotocol.io/
+- **LibreOffice**: https://www.libreoffice.org/
+- **FastMCP Framework**: https://github.com/modelcontextprotocol/python-sdk
 
-### Conversion Failures
-If document conversions fail:
-1. Check that the source file exists and is readable
-2. Verify the target format is supported by LibreOffice
-3. Ensure you have write permissions in the target directory
+## 📞 Support
 
-### Performance Issues
-For large documents or batch operations:
-1. Consider using smaller `max_rows` for spreadsheets
-2. Use appropriate file formats for your use case
-3. Monitor system resources during batch operations
+- **Issues**: Use GitHub issues for bug reports
+- **Documentation**: See the `docs/` folder for detailed guides
+- **Examples**: Check `EXAMPLES.md` for usage patterns
 
-## Support
+---
 
-For issues and questions:
-1. Check the troubleshooting section above
-2. Review LibreOffice documentation for format support
-3. Check the MCP protocol documentation for integration help
+*LibreOffice MCP Server v0.1.0 - Bridging AI and Document Processing*
