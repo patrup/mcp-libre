@@ -8,7 +8,7 @@ A comprehensive Model Context Protocol (MCP) server that provides tools and reso
 
 ## 📂 Repository Structure
 
-This repository is well-organized into logical directories:
+This repository is organized into logical directories:
 
 - **`src/`** - Core MCP server implementation
 - **`tests/`** - Test suite and validation scripts  
