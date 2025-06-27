@@ -5,11 +5,11 @@
 			"args": [
 				"run",
 				"python",
-				"/path/to/mcp-libre/main.py"
+				"/path/to/mcp-libre/src/main.py"
 			],
 			"cwd": "/path/to/mcp-libre",
 			"env": {
-				"PYTHONPATH": "/path/to/mcp-libre"
+				"PYTHONPATH": "/path/to/mcp-libre/src"
 			}
 		}
 	}

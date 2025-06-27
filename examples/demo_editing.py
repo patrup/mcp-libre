@@ -9,7 +9,11 @@ if it supported MCP (currently only works with Claude Desktop and Super Assistan
 import asyncio
 import tempfile
 import os
+import sys
 from pathlib import Path
+
+# Add the src directory to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src'))
 
 # Import the MCP server functions directly
 from libremcp import (

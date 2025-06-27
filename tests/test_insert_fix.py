@@ -6,7 +6,11 @@ Test script for the insert_text_at_position function to verify the fix
 
 import tempfile
 import os
+import sys
 from pathlib import Path
+
+# Add the src directory to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src'))
 
 # Import the functions we need to test
 from libremcp import create_document, insert_text_at_position, read_document_text

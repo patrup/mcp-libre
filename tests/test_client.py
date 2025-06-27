@@ -6,6 +6,12 @@ This demonstrates basic usage of the server tools
 
 import asyncio
 import json
+import sys
+import os
+
+# Add the src directory to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src'))
+
 from mcp.shared.memory import create_connected_server_and_client_session as client_session
 from libremcp import mcp
 

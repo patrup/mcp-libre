@@ -8,7 +8,12 @@ This shows how to see changes in real-time as you modify documents via MCP
 import asyncio
 import tempfile
 import time
+import sys
+import os
 from pathlib import Path
+
+# Add the src directory to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src'))
 
 # Import the MCP functions
 from libremcp import (

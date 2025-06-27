@@ -6,6 +6,19 @@ A comprehensive Model Context Protocol (MCP) server that provides tools and reso
 [![LibreOffice](https://img.shields.io/badge/LibreOffice-24.2+-green.svg)](https://www.libreoffice.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-orange.svg)](https://spec.modelcontextprotocol.io/)
 
+## 📂 Repository Structure
+
+This repository is well-organized into logical directories:
+
+- **`src/`** - Core MCP server implementation
+- **`tests/`** - Test suite and validation scripts  
+- **`examples/`** - Demo scripts and usage examples
+- **`config/`** - Configuration templates for integrations
+- **`scripts/`** - Utility scripts for setup and management
+- **`docs/`** - Comprehensive documentation
+
+For detailed information, see [`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_STRUCTURE.md).
+
 ## 🚀 Features
 
 ### Document Operations
