@@ -96,7 +96,7 @@ uv run python main.py
 ./mcp-helper.sh proxy
 
 # Then configure Super Assistant extension:
-# Server URL: http://localhost:3000
+# Server URL: http://localhost:3006
 ```
 
 ## 🔧 Available Tools
@@ -147,6 +147,7 @@ uv run python main.py
 ### 2. Super Assistant Chrome Extension
 ```bash
 npx @srbhptl39/mcp-superassistant-proxy@latest --config /path/to/mcp.config.json
+# Server URL: http://localhost:3006
 ```
 
 ### 3. Direct MCP Client

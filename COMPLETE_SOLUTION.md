@@ -129,7 +129,7 @@ npx @srbhptl39/mcp-superassistant-proxy@latest --config /home/patrick/Documents/
 ```
 
 Extension configuration:
-- Server URL: `http://localhost:3000`
+- Server URL: `http://localhost:3006`
 - Type: MCP Server
 - Authentication: None
 

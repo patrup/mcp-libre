@@ -51,7 +51,7 @@ npx @srbhptl39/mcp-superassistant-proxy@latest --config /home/patrick/Documents/
 ```
 
 This will:
-- Start the MCP proxy server (typically on `http://localhost:3000`)
+- Start the MCP proxy server (on `http://localhost:3006`)
 - Load both the Blender and LibreOffice MCP servers
 - Provide a bridge between the Chrome extension and the MCP servers
 
@@ -59,7 +59,7 @@ This will:
 
 1. Open Chrome and navigate to the Super Assistant extension
 2. Configure the extension to connect to the local proxy:
-   - **Server URL**: `http://localhost:3000` (or the URL shown by the proxy)
+   - **Server URL**: `http://localhost:3006` (or the URL shown by the proxy)
    - **API Type**: MCP or Local MCP Server
 3. Save the configuration
 

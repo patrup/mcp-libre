@@ -139,7 +139,7 @@ Error: source file could not be loaded
    ./mcp-helper.sh proxy
    
    # Check if it's running
-   curl http://localhost:3000/health
+   curl http://localhost:3006/health
    ```
 
 3. **Test the server directly**:

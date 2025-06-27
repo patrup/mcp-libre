@@ -41,7 +41,7 @@ Unfortunately, **ChatGPT in the browser cannot directly connect to MCP servers**
    ```
 
 3. **Configure Extension**:
-   - Server URL: `http://localhost:3000`
+   - Server URL: `http://localhost:3006`
    - Enable LibreOffice MCP tools
 
 #### Usage in Super Assistant:
@@ -105,7 +105,7 @@ Create a web interface that:
    ./mcp-helper.sh proxy
    
    # Then use Super Assistant extension with:
-   # Server URL: http://localhost:3000
+   # Server URL: http://localhost:3006
    ```
 
 3. **For ChatGPT interaction**, use the hybrid approach:

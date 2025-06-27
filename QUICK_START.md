@@ -19,7 +19,7 @@
 
 ## Super Assistant Extension Configuration
 
-- **Server URL**: `http://localhost:3000`
+- **Server URL**: `http://localhost:3006`
 - **Type**: MCP Server / Local MCP
 - **Authentication**: None (local server)
 
@@ -105,7 +105,7 @@ libreoffice --headless --help
 ### If Super Assistant Can't Connect
 1. Make sure proxy is running (`mcp-helper.sh proxy`)
 2. Check Chrome allows localhost connections
-3. Verify Super Assistant settings use `http://localhost:3000`
+3. Verify Super Assistant settings use `http://localhost:3006`
 
 ## Need Help?
 
