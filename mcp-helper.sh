@@ -354,8 +354,11 @@ show_help() {
     echo "  2. Install required components"
     echo "  3. Run '$0 check' to verify setup"
     echo "  4. Run '$0 test' to test functionality"
-    echo "  5. Run './generate-config.sh' to create MCP configuration"
-    echo "  6. Run '$0 proxy' to start the proxy server (for Super Assistant)"
+    echo "  5. Run './generate-config.sh' to create configurations"
+    echo "     - For Claude Desktop: './generate-config.sh claude'"
+    echo "     - For Super Assistant: './generate-config.sh mcp'"
+    echo "     - For both: './generate-config.sh both'"
+    echo "  6. Run '$0 proxy' to start proxy (Super Assistant only)"
     echo "  7. Configure AI assistant to use the MCP server"
     echo ""
 }

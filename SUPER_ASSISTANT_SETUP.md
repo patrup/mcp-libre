@@ -17,7 +17,10 @@ Use the provided configuration generator to create your personalized config file
 
 ```bash
 # Run from the mcp-libre project directory
-./generate-config.sh
+./generate-config.sh mcp
+
+# Or generate both Claude Desktop and Super Assistant configs
+./generate-config.sh both
 
 # This creates ~/Documents/mcp/mcp.config.json with your actual paths
 ```

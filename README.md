@@ -132,21 +132,23 @@ uv run python main.py
 ## 🔗 Integration Options
 
 ### 1. Claude Desktop
-```json
-{
-  "mcpServers": {
-    "libreoffice": {
-      "command": "uv",
-      "args": ["run", "python", "/path/to/mcp-libre/main.py"],
-      "cwd": "/path/to/mcp-libre"
-    }
-  }
-}
+
+Generate configuration automatically:
+```bash
+./generate-config.sh claude
+# Creates ~/.config/claude/claude_desktop_config.json
 ```
 
+Then restart Claude Desktop and start using LibreOffice commands:
+- *"Create a new Writer document and save it as project-report.odt"*
+- *"Convert my document to PDF format"*
+
 ### 2. Super Assistant Chrome Extension
+
+Generate configuration and start proxy:
 ```bash
-npx @srbhptl39/mcp-superassistant-proxy@latest --config /path/to/mcp.config.json
+./generate-config.sh mcp
+npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.config.json
 # Server URL: http://localhost:3006
 ```
 
@@ -224,17 +226,25 @@ uv run python libremcp.py --test
 
 ### MCP Configuration for Integrations
 
-Generate a personalized configuration file for Super Assistant or other MCP clients:
+Generate personalized configuration files for Claude Desktop and/or Super Assistant:
 
 ```bash
-# Generate config file (saves to ~/Documents/mcp/mcp.config.json)
+# Generate both Claude Desktop and Super Assistant configs
 ./generate-config.sh
 
-# Or specify custom location
-./generate-config.sh /path/to/custom/directory
+# Generate only Claude Desktop config
+./generate-config.sh claude
+
+# Generate only Super Assistant config  
+./generate-config.sh mcp
+
+# Generate Super Assistant config in custom location
+./generate-config.sh mcp /path/to/custom/directory
 ```
 
-This creates a configuration with your actual project paths automatically.
+This automatically creates configurations with your actual project paths:
+- **Claude Desktop**: `~/.config/claude/claude_desktop_config.json`
+- **Super Assistant**: `~/Documents/mcp/mcp.config.json` (or custom location)
 
 ### Environment Variables
 ```bash
