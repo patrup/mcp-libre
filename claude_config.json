@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "libreoffice": {
+      "command": "uv",
+      "args": [
+        "run", 
+        "python", 
+        "/home/patrick/work/mcp/mcp-libre/main.py"
+      ],
+      "cwd": "/home/patrick/work/mcp/mcp-libre",
+      "env": {
+        "PYTHONPATH": "/home/patrick/work/mcp/mcp-libre"
+      }
+    }
+  }
+}
