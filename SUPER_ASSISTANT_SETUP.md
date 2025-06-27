@@ -11,7 +11,7 @@ This guide explains how to use the LibreOffice MCP server with the Super Assista
 
 ## Configuration Files
 
-### 1. MCP Configuration (`/home/patrick/Documents/mcp/mcp.config.json`)
+### 1. MCP Configuration (`<PATH_TO>/mcp.config.json`)
 
 The configuration file has been updated to include both Blender and LibreOffice MCP servers:
 
