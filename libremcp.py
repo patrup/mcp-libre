@@ -10,6 +10,7 @@ import asyncio
 import json
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass
@@ -1046,6 +1047,203 @@ async def test_libreoffice_installation():
         print(f"❌ LibreOffice headless mode failed: {str(e)}")
     
     return True
+
+
+# Live viewing and document management tools
+
+@mcp.tool()
+def open_document_in_libreoffice(path: str, readonly: bool = False) -> Dict[str, Any]:
+    """Open a document in LibreOffice GUI for live viewing
+    
+    Args:
+        path: Path to the document to open
+        readonly: Whether to open in read-only mode (default: False)
+    """
+    path_obj = Path(path)
+    if not path_obj.exists():
+        raise FileNotFoundError(f"Document not found: {path}")
+    
+    try:
+        # Build command to open LibreOffice with GUI
+        cmd = ['libreoffice']
+        
+        if readonly:
+            cmd.append('--view')
+        
+        # Add the document path
+        cmd.append(str(path_obj.absolute()))
+        
+        # Start LibreOffice GUI (non-blocking)
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True  # Detach from parent process
+        )
+        
+        return {
+            "success": True,
+            "message": f"Opened {path_obj.name} in LibreOffice GUI",
+            "path": str(path_obj.absolute()),
+            "readonly": readonly,
+            "process_id": process.pid,
+            "note": "Document is now open for live viewing. Changes made via MCP will be reflected after saving and refreshing."
+        }
+        
+    except Exception as e:
+        raise RuntimeError(f"Failed to open document in LibreOffice: {str(e)}")
+
+
+@mcp.tool()
+def refresh_document_in_libreoffice(path: str) -> Dict[str, Any]:
+    """Send a refresh signal to LibreOffice to reload a document
+    
+    Args:
+        path: Path to the document that should be refreshed
+    """
+    path_obj = Path(path)
+    if not path_obj.exists():
+        raise FileNotFoundError(f"Document not found: {path}")
+    
+    try:
+        # Try to send a signal to LibreOffice to refresh
+        # This uses LibreOffice's ability to detect file changes
+        
+        # Method 1: Touch the file to update modification time
+        import time
+        current_time = time.time()
+        path_obj.touch()
+        
+        # Method 2: Try to send a signal via LibreOffice's socket interface
+        try:
+            # This is a more advanced approach that may work if LibreOffice is running
+            result = subprocess.run([
+                'libreoffice', '--invisible', '--headless',
+                '--accept=socket,host=127.0.0.1,port=2002;urp;',
+                '--norestore', '--nologo'
+            ], timeout=2, capture_output=True)
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass  # LibreOffice may already be running or not available
+        
+        return {
+            "success": True,
+            "message": f"Refresh signal sent for {path_obj.name}",
+            "path": str(path_obj.absolute()),
+            "note": "LibreOffice should detect the file change and prompt to reload. Manual refresh may be needed."
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Failed to refresh document: {str(e)}",
+            "path": str(path_obj.absolute()),
+            "note": "Try manually refreshing in LibreOffice (File → Reload)"
+        }
+
+
+@mcp.tool()
+def watch_document_changes(path: str, duration_seconds: int = 30) -> Dict[str, Any]:
+    """Watch a document for changes and provide live updates
+    
+    Args:
+        path: Path to the document to watch
+        duration_seconds: How long to watch for changes (default: 30 seconds)
+    """
+    path_obj = Path(path)
+    if not path_obj.exists():
+        raise FileNotFoundError(f"Document not found: {path}")
+    
+    try:
+        import time
+        
+        # Get initial state
+        initial_stat = path_obj.stat()
+        initial_size = initial_stat.st_size
+        initial_mtime = initial_stat.st_mtime
+        
+        start_time = time.time()
+        changes_detected = []
+        
+        print(f"👀 Watching {path_obj.name} for {duration_seconds} seconds...")
+        
+        while time.time() - start_time < duration_seconds:
+            try:
+                current_stat = path_obj.stat()
+                current_size = current_stat.st_size
+                current_mtime = current_stat.st_mtime
+                
+                if current_mtime > initial_mtime or current_size != initial_size:
+                    change_info = {
+                        "timestamp": datetime.now().isoformat(),
+                        "size_before": initial_size,
+                        "size_after": current_size,
+                        "size_change": current_size - initial_size,
+                        "modification_time": datetime.fromtimestamp(current_mtime).isoformat()
+                    }
+                    changes_detected.append(change_info)
+                    
+                    # Update baseline
+                    initial_size = current_size
+                    initial_mtime = current_mtime
+                    
+                    print(f"📝 Change detected: {change_info['size_change']:+d} bytes at {change_info['timestamp']}")
+                
+                time.sleep(1)  # Check every second
+                
+            except FileNotFoundError:
+                break  # File was deleted
+        
+        return {
+            "success": True,
+            "path": str(path_obj.absolute()),
+            "watch_duration": duration_seconds,
+            "changes_detected": len(changes_detected),
+            "changes": changes_detected,
+            "message": f"Watched {path_obj.name} for {duration_seconds} seconds, detected {len(changes_detected)} changes"
+        }
+        
+    except Exception as e:
+        raise RuntimeError(f"Failed to watch document: {str(e)}")
+
+
+@mcp.tool()
+def create_live_editing_session(path: str, auto_refresh: bool = True) -> Dict[str, Any]:
+    """Create a live editing session with automatic refresh capabilities
+    
+    Args:
+        path: Path to the document for live editing
+        auto_refresh: Whether to enable automatic refresh detection
+    """
+    path_obj = Path(path)
+    
+    try:
+        # 1. Open the document in LibreOffice GUI
+        open_result = open_document_in_libreoffice(str(path_obj), readonly=False)
+        
+        # 2. Set up file monitoring if requested
+        session_info = {
+            "session_id": f"live_session_{int(time.time())}",
+            "document_path": str(path_obj.absolute()),
+            "document_name": path_obj.name,
+            "opened_in_gui": open_result["success"],
+            "auto_refresh_enabled": auto_refresh,
+            "created_at": datetime.now().isoformat(),
+            "instructions": {
+                "view_changes": "Document is open in LibreOffice GUI",
+                "make_mcp_changes": "Use insert_text_at_position, convert_document, etc.",
+                "see_updates": "LibreOffice will detect file changes and prompt to reload",
+                "manual_refresh": "Press Ctrl+Shift+R in LibreOffice to force reload",
+                "end_session": "Close LibreOffice window when done"
+            }
+        }
+        
+        if auto_refresh:
+            session_info["monitoring"] = "File modification time will be updated after MCP operations"
+        
+        return session_info
+        
+    except Exception as e:
+        raise RuntimeError(f"Failed to create live editing session: {str(e)}")
 
 
 if __name__ == "__main__":

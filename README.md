@@ -25,6 +25,12 @@ A comprehensive Model Context Protocol (MCP) server that provides tools and reso
 - **Merge Documents**: Combine multiple documents into one
 - **Document Analysis**: Get detailed statistics (word count, sentences, etc.)
 
+### Live Viewing & Real-time Editing
+- **GUI Integration**: Open documents in LibreOffice for live viewing
+- **Real-time Updates**: See changes as AI assistants modify documents
+- **Change Monitoring**: Watch documents for modifications in real-time
+- **Interactive Sessions**: Create live editing sessions with automatic refresh
+
 ### MCP Resources
 - **Document Discovery**: List all LibreOffice documents (`documents://`)
 - **Content Access**: Access specific document content (`document://{path}`)
@@ -107,11 +113,16 @@ uv run python main.py
 | `batch_convert_documents` | Batch format conversion |
 | `merge_text_documents` | Merge multiple documents |
 | `get_document_statistics` | Document analysis |
+| `open_document_in_libreoffice` | Open document in GUI for live viewing |
+| `create_live_editing_session` | Start live editing with real-time preview |
+| `watch_document_changes` | Monitor document changes in real-time |
+| `refresh_document_in_libreoffice` | Force document refresh in GUI |
 
 ## 📚 Documentation
 
 - **[Prerequisites](PREREQUISITES.md)**: Quick reference for system requirements
 - **[Examples](EXAMPLES.md)**: Code examples and usage patterns
+- **[Live Viewing Guide](LIVE_VIEWING_GUIDE.md)**: See changes live in LibreOffice GUI
 - **[Super Assistant Setup](SUPER_ASSISTANT_SETUP.md)**: Chrome extension integration
 - **[ChatGPT Browser Guide](CHATGPT_BROWSER_GUIDE.md)**: Using with ChatGPT and alternatives
 - **[Troubleshooting](TROUBLESHOOTING.md)**: Common issues and solutions
