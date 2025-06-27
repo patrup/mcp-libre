@@ -192,7 +192,7 @@ def main():
     print("")
     print("2. 🌐 Super Assistant (Browser):")
     print("   - Run: ./mcp-helper.sh proxy")
-    print("   - Configure extension to use http://localhost:3000")
+    print("   - Configure extension to use http://localhost:3006")
     print("   - Ask: 'Edit this Writer document'")
     print("")
     print("3. ❌ ChatGPT Browser:")
