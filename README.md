@@ -35,6 +35,11 @@ A comprehensive Model Context Protocol (MCP) server that provides tools and reso
 - **Python**: 3.12+
 - **UV Package Manager**: For dependency management
 
+For detailed installation instructions for all platforms, run:
+```bash
+./mcp-helper.sh requirements
+```
+
 ## 🛠 Installation
 
 1. **Clone the repository**:
@@ -43,19 +48,20 @@ A comprehensive Model Context Protocol (MCP) server that provides tools and reso
    cd mcp-libre
    ```
 
-2. **Install dependencies**:
+2. **Check prerequisites**:
+   ```bash
+   ./mcp-helper.sh requirements  # Show detailed requirements
+   ./mcp-helper.sh check         # Verify your system
+   ```
+
+3. **Install dependencies**:
    ```bash
    uv sync
    ```
 
-3. **Make helper script executable**:
+4. **Make helper script executable**:
    ```bash
    chmod +x mcp-helper.sh
-   ```
-
-4. **Verify installation**:
-   ```bash
-   ./mcp-helper.sh check
    ```
 
 ## 🎯 Quick Start
@@ -183,16 +189,19 @@ result = convert_document("/tmp/report.odt", "/tmp/report.pdf", "pdf")
 ## 🧪 Testing
 
 ```bash
-# Check dependencies
+# Show system requirements and installation guides
+./mcp-helper.sh requirements
+
+# Check dependencies and verify setup
 ./mcp-helper.sh check
 
-# Run built-in tests
+# Run built-in functionality tests
 ./mcp-helper.sh test
 
-# Interactive demo
+# Interactive demo of all capabilities
 ./mcp-helper.sh demo
 
-# Test specific functionality
+# Test specific functionality directly
 uv run python libremcp.py --test
 ```
 
