@@ -44,7 +44,7 @@ For detailed installation instructions for all platforms, run:
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/patrup/mcp-libre/
    cd mcp-libre
    ```
 
