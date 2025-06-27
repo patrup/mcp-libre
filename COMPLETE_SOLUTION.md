@@ -125,7 +125,7 @@ Configuration file: `claude_config.json`
 ### 2. Super Assistant Chrome Extension
 Start proxy server:
 ```bash
-npx @srbhptl39/mcp-superassistant-proxy@latest --config /home/patrick/Documents/mcp/mcp.config.json
+npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.config.json
 ```
 
 Extension configuration:
@@ -295,7 +295,7 @@ The server is now ready for production use with AI assistants, automation script
 ## 📞 Support & Resources
 
 - **Project Directory**: `<PATH_TO>/mcp-libre/`
-- **Configuration**: `/home/patrick/Documents/mcp/mcp.config.json`
+- **Configuration**: `~/Documents/mcp/mcp.config.json`
 - **Helper Script**: `./mcp-helper.sh`
 - **Documentation**: See README.md, EXAMPLES.md, and setup guides
 - **Testing**: Run `./mcp-helper.sh demo` for interactive testing

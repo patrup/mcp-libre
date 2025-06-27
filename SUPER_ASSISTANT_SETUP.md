@@ -47,7 +47,7 @@ The configuration file has been updated to include both Blender and LibreOffice 
 Run the proxy server with the configuration file:
 
 ```bash
-npx @srbhptl39/mcp-superassistant-proxy@latest --config /home/patrick/Documents/mcp/mcp.config.json
+npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.config.json
 ```
 
 This will:
@@ -105,17 +105,17 @@ Here are some example commands you can use in the Super Assistant:
 
 ### Reading Documents
 ```
-"Read the text content from /home/patrick/Documents/important_document.odt"
+"Read the text content from ~/Documents/important_document.odt"
 ```
 
 ### Converting Documents
 ```
-"Convert /home/patrick/Documents/report.odt to PDF format and save it as /home/patrick/Documents/report.pdf"
+"Convert ~/Documents/report.odt to PDF format and save it as ~/Documents/report.pdf"
 ```
 
 ### Document Analysis
 ```
-"Get detailed statistics for the document at /home/patrick/Documents/essay.odt"
+"Get detailed statistics for the document at ~/Documents/essay.odt"
 ```
 
 ### Searching
@@ -125,7 +125,7 @@ Here are some example commands you can use in the Super Assistant:
 
 ### Batch Operations
 ```
-"Convert all ODT files in /home/patrick/Documents/reports/ to PDF format"
+"Convert all ODT files in ~/Documents/reports/ to PDF format"
 ```
 
 ## Troubleshooting

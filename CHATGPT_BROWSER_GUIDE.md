@@ -37,7 +37,7 @@ Unfortunately, **ChatGPT in the browser cannot directly connect to MCP servers**
    ```bash
    ./mcp-helper.sh proxy
    # Or manually:
-   # npx @srbhptl39/mcp-superassistant-proxy@latest --config /home/patrick/Documents/mcp/mcp.config.json
+   # npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.config.json
    ```
 
 3. **Configure Extension**:

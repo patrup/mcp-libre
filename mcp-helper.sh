@@ -2,11 +2,16 @@
 
 # LibreOffice MCP Server Helper Script
 # This script helps with testing, deployment, and integration
+#
+# Configuration:
+# - MCP_CONFIG_PATH: Override the default MCP config location
+#   Default: $HOME/Documents/mcp/mcp.config.json
+#   Usage: MCP_CONFIG_PATH=/custom/path/mcp.config.json ./mcp-helper.sh proxy
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_CONFIG_PATH="/home/patrick/Documents/mcp/mcp.config.json"
+MCP_CONFIG_PATH="${MCP_CONFIG_PATH:-$HOME/Documents/mcp/mcp.config.json}"
 
 # Colors for output
 RED='\033[0;31m'

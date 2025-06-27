@@ -30,7 +30,7 @@
 - *"Create a spreadsheet for tracking expenses"*
 
 ### 📖 Reading Documents  
-- *"Read the content from my document at /home/patrick/Documents/report.odt"*
+- *"Read the content from my document at ~/Documents/report.odt"*
 - *"What are the statistics for the document at ~/Desktop/essay.odt?"*
 
 ### 🔄 Format Conversion
@@ -65,9 +65,9 @@
 
 ## File Paths You Can Use
 
-- **Home Directory**: `~/` or `/home/patrick/`
-- **Documents**: `~/Documents/` or `/home/patrick/Documents/`
-- **Desktop**: `~/Desktop/` or `/home/patrick/Desktop/`
+- **Home Directory**: `~/` or `/home/username/`
+- **Documents**: `~/Documents/` or `/home/username/Documents/`
+- **Desktop**: `~/Desktop/` or `/home/username/Desktop/`
 - **Temp Files**: `/tmp/` (for testing)
 
 ## Supported File Formats
