@@ -264,7 +264,15 @@ libreoffice --headless --convert-to pdf document.odt
 
 ## 📄 License
 
-This project is open source. Please check the license file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The MIT License is a permissive license that allows:
+- ✅ Commercial use
+- ✅ Modification
+- ✅ Distribution
+- ✅ Private use
+
+For other license options, see [LICENSE_OPTIONS.md](LICENSE_OPTIONS.md).
 
 ## 🔗 Links
 

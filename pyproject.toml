@@ -3,6 +3,20 @@ name = "mcp-libre"
 version = "0.1.0"
 description = "LibreOffice Model Context Protocol Server - Provides tools and resources for interacting with LibreOffice documents"
 readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "LibreOffice MCP Server Project"},
+]
+keywords = ["mcp", "libreoffice", "document", "processing", "ai", "assistant"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Office Suites",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28.1",
