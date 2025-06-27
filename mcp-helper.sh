@@ -35,31 +35,106 @@ print_error() {
 
 check_dependencies() {
     print_header
-    echo "Checking dependencies..."
+    echo "Checking system prerequisites..."
+    echo ""
     
-    # Check LibreOffice
+    local all_ok=true
+    
+    # Check LibreOffice (Required)
+    echo "LibreOffice (Required - Version 24.2+):"
     if command -v libreoffice >/dev/null 2>&1; then
-        print_status "LibreOffice is installed"
-        libreoffice --version
+        local version=$(libreoffice --version 2>/dev/null | head -1)
+        print_status "LibreOffice is installed: $version"
+        
+        # Test headless mode
+        if libreoffice --headless --help >/dev/null 2>&1; then
+            print_status "LibreOffice headless mode is working"
+        else
+            print_warning "LibreOffice headless mode may have issues"
+        fi
     else
-        print_error "LibreOffice not found. Please install LibreOffice."
-        exit 1
+        print_error "LibreOffice not found. Please install LibreOffice 24.2+"
+        echo "  Ubuntu/Debian: sudo apt install libreoffice"
+        echo "  macOS: brew install --cask libreoffice"
+        echo "  Windows: Download from https://www.libreoffice.org/download/"
+        all_ok=false
     fi
+    echo ""
     
-    # Check Python and uv
+    # Check Python (Required)
+    echo "Python (Required - Version 3.12+):"
+    if command -v python3 >/dev/null 2>&1; then
+        local python_version=$(python3 --version 2>&1)
+        print_status "Python is installed: $python_version"
+        
+        # Check if version is 3.12+
+        local version_check=$(python3 -c "import sys; print('ok' if sys.version_info >= (3, 12) else 'old')" 2>/dev/null || echo "error")
+        if [ "$version_check" = "ok" ]; then
+            print_status "Python version meets requirements (3.12+)"
+        elif [ "$version_check" = "old" ]; then
+            print_error "Python version is too old. Need Python 3.12+"
+            all_ok=false
+        else
+            print_warning "Could not verify Python version"
+        fi
+    else
+        print_error "Python3 not found. Please install Python 3.12+"
+        echo "  Ubuntu/Debian: sudo apt install python3.12"
+        echo "  macOS: brew install python@3.12"
+        echo "  Windows: Download from https://www.python.org/downloads/"
+        all_ok=false
+    fi
+    echo ""
+    
+    # Check UV Package Manager (Required)
+    echo "UV Package Manager (Required - Latest):"
     if command -v uv >/dev/null 2>&1; then
-        print_status "UV package manager is available"
+        local uv_version=$(uv --version 2>/dev/null | head -1)
+        print_status "UV package manager is available: $uv_version"
     else
         print_error "UV package manager not found. Please install uv."
-        exit 1
+        echo "  Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
+        echo "  Or: pip install uv"
+        all_ok=false
     fi
+    echo ""
     
-    # Check Node.js for proxy
+    # Check Node.js/NPX (Optional - for Super Assistant proxy)
+    echo "Node.js/NPX (Optional - for Super Assistant Chrome extension):"
     if command -v npx >/dev/null 2>&1; then
-        print_status "Node.js/NPX is available"
-        node --version
+        local node_version=$(node --version 2>/dev/null)
+        print_status "Node.js/NPX is available: $node_version"
+        print_status "Super Assistant proxy support enabled"
     else
-        print_warning "Node.js/NPX not found. Needed for MCP proxy."
+        print_warning "Node.js/NPX not found. Needed for Super Assistant Chrome extension."
+        echo "  Ubuntu/Debian: sudo apt install nodejs npm"
+        echo "  macOS: brew install node"
+        echo "  Windows: Download from https://nodejs.org/"
+    fi
+    echo ""
+    
+    # Check Java (Optional - for advanced LibreOffice features)
+    echo "Java (Optional - for advanced LibreOffice features like PDF generation):"
+    if command -v java >/dev/null 2>&1; then
+        local java_version=$(java -version 2>&1 | head -1)
+        print_status "Java is installed: $java_version"
+        print_status "Advanced LibreOffice features available"
+    else
+        print_warning "Java not found. Some LibreOffice features may be limited."
+        echo "  Ubuntu/Debian: sudo apt install default-jre"
+        echo "  macOS: brew install openjdk"
+        echo "  Windows: Download from https://adoptium.net/"
+    fi
+    echo ""
+    
+    # Summary
+    if [ "$all_ok" = true ]; then
+        print_status "All required dependencies are satisfied!"
+        echo "Ready to run LibreOffice MCP Server."
+    else
+        print_error "Some required dependencies are missing."
+        echo "Please install the missing components and run '$0 check' again."
+        exit 1
     fi
     
     echo ""
@@ -102,6 +177,95 @@ run_demo() {
     uv run python test_client.py
 }
 
+show_requirements() {
+    print_header
+    echo "LibreOffice MCP Server - System Requirements"
+    echo ""
+    
+    echo -e "${BLUE}Required Components:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    echo "1. LibreOffice (Version 24.2 or higher)"
+    echo "   Purpose: Document processing engine"
+    echo "   Features: Create, read, convert documents"
+    echo "   Install:"
+    echo "     • Ubuntu/Debian: sudo apt install libreoffice"
+    echo "     • CentOS/RHEL: sudo yum install libreoffice"
+    echo "     • macOS: brew install --cask libreoffice"
+    echo "     • Windows: https://www.libreoffice.org/download/"
+    echo ""
+    
+    echo "2. Python (Version 3.12 or higher)"
+    echo "   Purpose: Runtime environment for MCP server"
+    echo "   Features: FastMCP framework, async operations"
+    echo "   Install:"
+    echo "     • Ubuntu/Debian: sudo apt install python3.12 python3.12-venv"
+    echo "     • macOS: brew install python@3.12"
+    echo "     • Windows: https://www.python.org/downloads/"
+    echo ""
+    
+    echo "3. UV Package Manager (Latest version)"
+    echo "   Purpose: Fast Python package management"
+    echo "   Features: Dependency resolution, virtual environments"
+    echo "   Install:"
+    echo "     • All platforms: curl -LsSf https://astral.sh/uv/install.sh | sh"
+    echo "     • Alternative: pip install uv"
+    echo ""
+    
+    echo -e "${YELLOW}Optional Components:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    echo "4. Node.js & NPM (Version 18+)"
+    echo "   Purpose: Super Assistant Chrome extension proxy"
+    echo "   Features: Browser integration, real-time document processing"
+    echo "   Install:"
+    echo "     • Ubuntu/Debian: sudo apt install nodejs npm"
+    echo "     • macOS: brew install node"
+    echo "     • Windows: https://nodejs.org/"
+    echo ""
+    
+    echo "5. Java Runtime Environment (JRE 11+)"
+    echo "   Purpose: Advanced LibreOffice features"
+    echo "   Features: PDF generation, complex document processing"
+    echo "   Install:"
+    echo "     • Ubuntu/Debian: sudo apt install default-jre"
+    echo "     • macOS: brew install openjdk"
+    echo "     • Windows: https://adoptium.net/"
+    echo ""
+    
+    echo -e "${BLUE}Integration Targets:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    echo "• Claude Desktop (Anthropic)"
+    echo "  - Direct MCP protocol integration"
+    echo "  - Configuration via claude_desktop_config.json"
+    echo ""
+    
+    echo "• Super Assistant Chrome Extension"
+    echo "  - Browser-based document processing"
+    echo "  - Requires MCP proxy server (Node.js)"
+    echo ""
+    
+    echo "• Direct MCP Clients"
+    echo "  - Python applications using FastMCP"
+    echo "  - Custom integrations via stdio transport"
+    echo ""
+    
+    echo -e "${GREEN}Minimum System Requirements:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "• Operating System: Linux, macOS, Windows"
+    echo "• Memory: 2GB RAM (4GB recommended)"
+    echo "• Storage: 2GB free space for LibreOffice + documents"
+    echo "• Network: Internet access for initial setup only"
+    echo ""
+    
+    echo "Run '$0 check' to verify your system meets these requirements."
+    echo ""
+}
+
 show_config() {
     echo "Current MCP configuration:"
     echo "Config file: $MCP_CONFIG_PATH"
@@ -119,29 +283,36 @@ show_help() {
     echo "Usage: $0 [COMMAND]"
     echo ""
     echo "Commands:"
-    echo "  check       Check dependencies and system requirements"
-    echo "  test        Run MCP server functionality tests"
-    echo "  demo        Run interactive demo of MCP capabilities"
-    echo "  proxy       Start the MCP proxy for Super Assistant"
-    echo "  config      Show current MCP configuration"
-    echo "  help        Show this help message"
+    echo "  requirements Show detailed system requirements and installation guides"
+    echo "  check        Check dependencies and system requirements"
+    echo "  test         Run MCP server functionality tests"
+    echo "  demo         Run interactive demo of MCP capabilities"
+    echo "  proxy        Start the MCP proxy for Super Assistant"
+    echo "  config       Show current MCP configuration"
+    echo "  help         Show this help message"
     echo ""
     echo "Examples:"
+    echo "  $0 requirements             # Show detailed system requirements"
     echo "  $0 check                    # Check if everything is set up correctly"
     echo "  $0 test                     # Test the LibreOffice MCP server"
     echo "  $0 proxy                    # Start proxy for Super Assistant"
     echo "  $0 demo                     # See what the server can do"
     echo ""
-    echo "Integration:"
-    echo "  1. Run '$0 check' to verify setup"
-    echo "  2. Run '$0 test' to test functionality"
-    echo "  3. Run '$0 proxy' to start the proxy server"
-    echo "  4. Configure Super Assistant extension to use http://localhost:3000"
+    echo "Integration Workflow:"
+    echo "  1. Run '$0 requirements' to see what you need"
+    echo "  2. Install required components"
+    echo "  3. Run '$0 check' to verify setup"
+    echo "  4. Run '$0 test' to test functionality"
+    echo "  5. Run '$0 proxy' to start the proxy server (for Super Assistant)"
+    echo "  6. Configure AI assistant to use the MCP server"
     echo ""
 }
 
 # Main command handling
 case "${1:-help}" in
+    "requirements"|"req")
+        show_requirements
+        ;;
     "check")
         check_dependencies
         ;;
