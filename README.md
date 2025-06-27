@@ -114,6 +114,7 @@ uv run python main.py
 - **[Examples](EXAMPLES.md)**: Code examples and usage patterns
 - **[Super Assistant Setup](SUPER_ASSISTANT_SETUP.md)**: Chrome extension integration
 - **[ChatGPT Browser Guide](CHATGPT_BROWSER_GUIDE.md)**: Using with ChatGPT and alternatives
+- **[Troubleshooting](TROUBLESHOOTING.md)**: Common issues and solutions
 - **[Quick Start](QUICK_START.md)**: Quick reference guide
 - **[Complete Solution](COMPLETE_SOLUTION.md)**: Comprehensive overview
 
