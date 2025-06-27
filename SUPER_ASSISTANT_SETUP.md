@@ -11,9 +11,18 @@ This guide explains how to use the LibreOffice MCP server with the Super Assista
 
 ## Configuration Files
 
-### 1. MCP Configuration (`<PATH_TO>/mcp.config.json`)
+### 1. Generate MCP Configuration
 
-The configuration file has been updated to include both Blender and LibreOffice MCP servers:
+Use the provided configuration generator to create your personalized config file:
+
+```bash
+# Run from the mcp-libre project directory
+./generate-config.sh
+
+# This creates ~/Documents/mcp/mcp.config.json with your actual paths
+```
+
+The generated configuration will include both servers (if you have Blender MCP installed):
 
 ```json
 {
@@ -29,11 +38,11 @@ The configuration file has been updated to include both Blender and LibreOffice 
         	"args": [
             	"run",
             	"python",
-            	"<PATH_TO>/mcp-libre/main.py"
+            	"/your/actual/path/to/mcp-libre/main.py"
         	],
-        	"cwd": "<PATH_TO>/mcp-libre",
+        	"cwd": "/your/actual/path/to/mcp-libre",
         	"env": {
-            	"PYTHONPATH": "<PATH_TO>/mcp-libre"
+            	"PYTHONPATH": "/your/actual/path/to/mcp-libre"
         	}
     	}
 	}

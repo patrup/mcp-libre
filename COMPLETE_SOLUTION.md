@@ -123,8 +123,13 @@ Configuration file: `claude_config.json`
 ```
 
 ### 2. Super Assistant Chrome Extension
-Start proxy server:
+
+Generate configuration and start proxy:
 ```bash
+# Generate config file (first time only)
+./generate-config.sh
+
+# Start proxy server
 npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.config.json
 ```
 

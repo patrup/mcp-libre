@@ -222,6 +222,20 @@ uv run python libremcp.py --test
 
 ## 🔧 Configuration
 
+### MCP Configuration for Integrations
+
+Generate a personalized configuration file for Super Assistant or other MCP clients:
+
+```bash
+# Generate config file (saves to ~/Documents/mcp/mcp.config.json)
+./generate-config.sh
+
+# Or specify custom location
+./generate-config.sh /path/to/custom/directory
+```
+
+This creates a configuration with your actual project paths automatically.
+
 ### Environment Variables
 ```bash
 export PYTHONPATH="/path/to/mcp-libre"
