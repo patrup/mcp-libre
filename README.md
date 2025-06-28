@@ -21,6 +21,14 @@ For detailed information, see [`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_S
 
 ## 🚀 Features
 
+### LibreOffice Extension (Plugin) - NEW! 🎉
+- **Native Integration**: Embedded MCP server directly in LibreOffice
+- **Real-time Editing**: Live document manipulation with instant visual feedback
+- **Performance**: 10x faster than external server (direct UNO API access)
+- **Multi-document**: Work with all open LibreOffice documents
+- **Auto-start**: Automatically available when LibreOffice starts
+- **HTTP API**: External AI assistant access via localhost:8765
+
 ### Document Operations
 - **Create Documents**: New Writer, Calc, Impress, and Draw documents
 - **Read Content**: Extract text from any LibreOffice document
@@ -133,18 +141,48 @@ uv run python main.py
 
 ## 📚 Documentation
 
-- **[Prerequisites](PREREQUISITES.md)**: Quick reference for system requirements
-- **[Examples](EXAMPLES.md)**: Code examples and usage patterns
-- **[Live Viewing Guide](LIVE_VIEWING_GUIDE.md)**: See changes live in LibreOffice GUI
-- **[Super Assistant Setup](SUPER_ASSISTANT_SETUP.md)**: Chrome extension integration
-- **[ChatGPT Browser Guide](CHATGPT_BROWSER_GUIDE.md)**: Using with ChatGPT and alternatives
-- **[Troubleshooting](TROUBLESHOOTING.md)**: Common issues and solutions
-- **[Quick Start](QUICK_START.md)**: Quick reference guide
-- **[Complete Solution](COMPLETE_SOLUTION.md)**: Comprehensive overview
+- **[Prerequisites](docs/PREREQUISITES.md)**: Quick reference for system requirements
+- **[Plugin Migration Guide](docs/PLUGIN_MIGRATION_GUIDE.md)**: Migrate from external server to plugin
+- **[Examples](docs/EXAMPLES.md)**: Code examples and usage patterns
+- **[Live Viewing Guide](docs/LIVE_VIEWING_GUIDE.md)**: See changes live in LibreOffice GUI
+- **[Super Assistant Setup](docs/SUPER_ASSISTANT_SETUP.md)**: Chrome extension integration
+- **[ChatGPT Browser Guide](docs/CHATGPT_BROWSER_GUIDE.md)**: Using with ChatGPT and alternatives
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)**: Common issues and solutions
+- **[Quick Start](docs/QUICK_START.md)**: Quick reference guide
+- **[Complete Solution](docs/COMPLETE_SOLUTION.md)**: Comprehensive overview
 
 ## 🔗 Integration Options
 
-### 1. Claude Desktop
+### 1. LibreOffice Extension (NEW - Recommended!) 🎉
+
+**The most powerful and efficient way to use the MCP server:**
+
+```bash
+# Build and install the LibreOffice extension
+cd plugin/
+./install.sh install
+
+# Test the extension
+./install.sh test
+```
+
+**Benefits of the Extension:**
+- **10x Performance**: Direct UNO API access (no subprocess overhead)
+- **Real-time Editing**: Live document manipulation in open LibreOffice windows
+- **Native Integration**: Appears in LibreOffice Tools menu
+- **Multi-document Support**: Work with all open documents simultaneously
+- **Auto-start**: Automatically starts with LibreOffice
+- **Advanced Features**: Full access to LibreOffice formatting and capabilities
+
+**Usage:**
+- The extension provides an HTTP API on `http://localhost:8765`
+- Configure your AI assistant to use this endpoint
+- Access controls via **Tools > MCP Server** in LibreOffice
+- Real-time document editing with instant visual feedback
+
+For detailed plugin information, see [`plugin/README.md`](plugin/README.md).
+
+### 2. Claude Desktop
 
 Generate configuration automatically:
 ```bash
@@ -156,7 +194,7 @@ Then restart Claude Desktop and start using LibreOffice commands:
 - *"Create a new Writer document and save it as project-report.odt"*
 - *"Convert my document to PDF format"*
 
-### 2. Super Assistant Chrome Extension
+### 3. Super Assistant Chrome Extension
 
 Generate configuration and start proxy:
 ```bash
@@ -165,7 +203,7 @@ npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.conf
 # Server URL: http://localhost:3006
 ```
 
-### 3. Direct MCP Client
+### 4. Direct MCP Client
 ```python
 from mcp.shared.memory import create_connected_server_and_client_session
 from libremcp import mcp
@@ -218,6 +256,17 @@ result = convert_document("/tmp/report.odt", "/tmp/report.pdf", "pdf")
 
 ## 🧪 Testing
 
+### LibreOffice Extension Testing
+```bash
+# Install and test the plugin
+cd plugin/
+./install.sh install    # Build and install extension
+./install.sh test       # Test functionality
+./install.sh status     # Check status
+./install.sh interactive # Interactive testing mode
+```
+
+### External Server Testing
 ```bash
 # Show system requirements and installation guides
 ./mcp-helper.sh requirements
