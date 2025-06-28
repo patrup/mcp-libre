@@ -3,7 +3,7 @@
 Main entry point for the LibreOffice MCP Server
 """
 
-from libremcp import main
+import libremcp
 
 if __name__ == "__main__":
-    main()
+    libremcp.main()

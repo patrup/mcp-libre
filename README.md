@@ -105,10 +105,16 @@ For detailed installation instructions for all platforms, run:
 ### Start MCP Server
 ```bash
 # Standard MCP mode (stdio)
-python main.py
+python src/main.py
 
 # Or using UV
-uv run python main.py
+uv run python src/main.py
+
+# Show help and options
+python src/main.py --help
+
+# Run tests
+python src/main.py --test
 ```
 
 ### Integration with Super Assistant

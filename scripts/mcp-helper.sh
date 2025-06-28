@@ -151,7 +151,7 @@ test_mcp_server() {
     cd "$PROJECT_ROOT"
     
     # Run the built-in test
-    if uv run python src/libremcp.py --test; then
+    if uv run python src/main.py --test; then
         print_status "MCP server test passed"
     else
         print_error "MCP server test failed"

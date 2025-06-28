@@ -959,12 +959,52 @@ def main():
     """Run the LibreOffice MCP server"""
     import sys
     
-    if len(sys.argv) > 1 and sys.argv[1] == "--test":
-        # Test mode - run some basic functionality tests
-        asyncio.run(test_server())
-    else:
-        # Normal server mode
+    # Parse command line arguments
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        
+        if arg == "--test":
+            # Test mode - run some basic functionality tests
+            print("🧪 Running LibreOffice MCP Server tests...")
+            asyncio.run(test_server())
+            return
+        
+        elif arg == "--help" or arg == "-h":
+            # Show help
+            print("LibreOffice MCP Server")
+            print("=" * 30)
+            print("Usage:")
+            print("  python src/main.py          # Start MCP server (stdio mode)")
+            print("  python src/main.py --test   # Run functionality tests")
+            print("  python src/main.py --help   # Show this help")
+            print("")
+            print("MCP Server Mode:")
+            print("  The server runs in stdio mode for MCP protocol communication.")
+            print("  It reads JSON-RPC messages from stdin and writes responses to stdout.")
+            print("  Use with MCP clients like Claude Desktop or test with test_client.py")
+            print("")
+            print("Testing:")
+            print("  cd tests/ && python test_client.py  # Interactive test client")
+            return
+        
+        elif arg == "--version":
+            print("LibreOffice MCP Server v1.0.0")
+            return
+    
+    # Normal server mode - show startup message and run
+    print("🚀 Starting LibreOffice MCP Server...", file=sys.stderr)
+    print("📡 Running in MCP protocol mode (stdio)", file=sys.stderr)
+    print("💡 Use --help for command line options", file=sys.stderr)
+    print("🔌 Connect via MCP clients or test with: cd tests/ && python test_client.py", file=sys.stderr)
+    print("", file=sys.stderr)
+    
+    try:
         mcp.run()
+    except KeyboardInterrupt:
+        print("\n👋 LibreOffice MCP Server stopped", file=sys.stderr)
+    except Exception as e:
+        print(f"\n❌ Server error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 async def test_server():
