@@ -10,6 +10,23 @@ mcp-libre/
 │   ├── __init__.py                 # Package initialization
 │   ├── libremcp.py                 # Main MCP server implementation
 │   └── main.py                     # Entry point script
+├── 📁 plugin/                      # LibreOffice Extension (NEW!)
+│   ├── 📁 META-INF/                # Extension metadata
+│   │   └── manifest.xml            # Extension manifest file
+│   ├── 📁 pythonpath/              # Python extension modules
+│   │   ├── uno_bridge.py           # UNO API bridge for LibreOffice
+│   │   ├── mcp_server.py           # Embedded MCP server
+│   │   ├── ai_interface.py         # HTTP API for AI assistants
+│   │   └── registration.py         # Extension registration and lifecycle
+│   ├── Addons.xcu                  # LibreOffice menu configuration
+│   ├── ProtocolHandler.xcu         # Protocol handler configuration
+│   ├── description.xml             # Extension description
+│   ├── description-en.txt          # English description text
+│   ├── release-notes-en.txt        # Release notes
+│   ├── README.md                   # Plugin documentation
+│   ├── build.sh                    # Extension build script
+│   ├── install.sh                  # Installation and management script
+│   └── test_plugin.py              # Plugin testing client
 ├── 📁 tests/                       # Test files
 │   ├── __init__.py                 # Test package initialization
 │   ├── test_client.py              # Interactive MCP client test
@@ -48,9 +65,29 @@ mcp-libre/
 ## 📋 File Descriptions
 
 ### Source Code (`src/`)
-- **`libremcp.py`**: Core MCP server implementation with all tools and resources
-- **`main.py`**: Entry point that imports and runs the MCP server
-- **`__init__.py`**: Makes src a Python package and exposes the main function
+
+**Core MCP server implementation for external usage:**
+
+- `libremcp.py`: Main MCP server with all tools and functionality
+- `main.py`: Entry point for running the external MCP server
+- `__init__.py`: Package initialization and exports
+
+### LibreOffice Extension (`plugin/`) - NEW!
+
+**Native LibreOffice plugin/extension implementation:**
+
+- `pythonpath/uno_bridge.py`: Bridge between MCP and LibreOffice UNO API
+- `pythonpath/mcp_server.py`: Embedded MCP server for the extension
+- `pythonpath/ai_interface.py`: HTTP API server for AI assistant connections
+- `pythonpath/registration.py`: Extension lifecycle management
+- `META-INF/manifest.xml`: Extension packaging manifest
+- `Addons.xcu`: LibreOffice menu and toolbar configuration
+- `ProtocolHandler.xcu`: Protocol handler registration
+- `description.xml`: Extension metadata and information
+- `build.sh`: Script to build the .oxt extension package
+- `install.sh`: Installation and management utilities
+- `test_plugin.py`: Testing client for the plugin HTTP API
+- `README.md`: Comprehensive plugin documentation
 
 ### Tests (`tests/`)
 - **`test_client.py`**: Interactive test client that demonstrates all MCP tools
