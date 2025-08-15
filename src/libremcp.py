@@ -193,9 +193,9 @@ def create_document(path: str, doc_type: str = "writer", content: str = "") -> D
                 # Try using LibreOffice to create an empty document
                 template_map = {
                     "writer": "--writer",
-                    "calc": "--calc", 
-                    "impress": "--impress",
-                    "draw": "--draw"
+                    "calc": ".ods", 
+                    "impress": ".odp",
+                    "draw": ".odg"
                 }
                 
                 # Create using LibreOffice command line
@@ -535,6 +535,7 @@ def _insert_text_writer_document(path: str, content: str) -> bool:
     """Insert text into Writer document using LibreOffice macro approach"""
     try:
         # Create a temporary script file for LibreOffice macro
+        escaped_content = content.replace('"', '\"')
         script_content = f'''
 import uno
 import sys
@@ -564,7 +565,7 @@ def modify_document():
         
         # Clear content and insert new content
         text = doc.getText()
-        text.setString("{content.replace('"', '\\"')}")
+        text.setString('{escaped_content}')
         
         # Save document
         doc.store()
@@ -705,6 +706,7 @@ def _create_minimal_odt(path: Path, content: str):
         # styles.xml (minimal)
         styles_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.2">
+ <office:scripts/>
  <office:font-face-decls/>
  <office:styles>
   <style:default-style style:family="paragraph">
@@ -726,7 +728,6 @@ def _create_minimal_odt(path: Path, content: str):
  </office:meta>
 </office:document-meta>'''
         zf.writestr('meta.xml', meta_xml)
-
 
 def _recreate_document_with_content(path: str, content: str):
     """Recreate any document with new content"""

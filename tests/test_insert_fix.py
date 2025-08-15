@@ -37,7 +37,7 @@ def test_insert_text_fix():
         print(f"✅ Initial content: '{content.content.strip()}'")
         print(f"   Word count: {content.word_count}")
         
-        # 3. Test inserting a simple character (this was failing before)
+        # 3. Test inserting a simple period '.' at the end...
         print("\n✏️  Step 3: Inserting a simple period '.' at the end...")
         try:
             result = insert_text_at_position(str(test_doc), ".", "end")
@@ -45,7 +45,7 @@ def test_insert_text_fix():
             print(f"   File updated: {result.filename}")
         except Exception as e:
             print(f"❌ Failed to insert period: {e}")
-            return False
+            raise
         
         # 4. Verify the change
         print("\n🔍 Step 4: Verifying the change...")
@@ -59,7 +59,7 @@ def test_insert_text_fix():
             print(f"✅ Successfully inserted at start")
         except Exception as e:
             print(f"❌ Failed to insert at start: {e}")
-            return False
+            raise
         
         # 6. Test replacing content
         print("\n🔄 Step 6: Replacing content...")
@@ -68,7 +68,7 @@ def test_insert_text_fix():
             print(f"✅ Successfully replaced content")
         except Exception as e:
             print(f"❌ Failed to replace content: {e}")
-            return False
+            raise
         
         # 7. Final verification
         print("\n📋 Step 7: Final verification...")
@@ -77,11 +77,10 @@ def test_insert_text_fix():
         print(f"   Final word count: {final_content.word_count}")
         
         print("\n🎉 All tests passed! The insert_text_at_position fix is working.")
-        return True
         
     except Exception as e:
         print(f"\n❌ Test failed with error: {e}")
-        return False
+        raise
         
     finally:
         # Clean up
@@ -104,7 +103,7 @@ def test_edge_cases():
         ("Empty string", ""),
         ("Just a space", " "),
         ("Single character", "x"),
-        ("Special characters", "!@#$%^&*()"),
+        ("Special characters", "!@#$%^&*()") ,
         ("Unicode", "Hello 世界 🌍"),
         ("Newlines", "Line 1\nLine 2\nLine 3"),
         ("Long text", "This is a very long text " * 20),
