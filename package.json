@@ -1,0 +1,18 @@
+{
+  "name": "mcp-libre",
+  "version": "0.2.0",
+  "description": "LibreOffice MCP Server",
+  "type": "module",
+  "main": "src/server.js",
+  "bin": {
+    "mcp-libre": "src/server.js"
+  },
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["mcp", "libreoffice", "document", "ai"],
+  "license": "MIT"
+}
