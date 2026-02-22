@@ -5,16 +5,47 @@ This module provides HTTP API interface for external AI assistants to communicat
 with the LibreOffice MCP server.
 """
 
-import asyncio
 import json
 import logging
+import os
 import threading
 from typing import Dict, Any, Optional
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-import socketserver
 
 from .mcp_server import get_mcp_server
+from .main_thread_executor import execute_on_main_thread
+
+
+def _get_version() -> str:
+    try:
+        from .version import EXTENSION_VERSION
+        return EXTENSION_VERSION
+    except Exception:
+        return "unknown"
+
+
+_agent_instructions_cache: Optional[str] = None
+
+
+def _load_agent_instructions() -> str:
+    """Load AGENT.md from the project root (cached after first read)."""
+    global _agent_instructions_cache
+    if _agent_instructions_cache is not None:
+        return _agent_instructions_cache
+    # pythonpath/ is one level below the extension root
+    ext_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for candidate in (
+        os.path.join(ext_dir, "AGENT.md"),           # dev-deploy layout
+        os.path.join(ext_dir, "..", "AGENT.md"),      # repo root fallback
+    ):
+        if os.path.isfile(candidate):
+            with open(candidate, "r", encoding="utf-8") as f:
+                _agent_instructions_cache = f.read()
+            return _agent_instructions_cache
+    _agent_instructions_cache = ""
+    return _agent_instructions_cache
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -23,10 +54,9 @@ logger = logging.getLogger(__name__)
 
 class MCPRequestHandler(BaseHTTPRequestHandler):
     """HTTP request handler for MCP API"""
-    
-    def __init__(self, *args, **kwargs):
-        self.mcp_server = get_mcp_server()
-        super().__init__(*args, **kwargs)
+
+    # Set at class level by AIInterface before server starts
+    mcp_server = None
     
     def do_GET(self):
         """Handle GET requests"""
@@ -39,7 +69,11 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
             elif path == '/tools':
                 self._send_response(200, self._get_tools_list())
             elif path == '/health':
-                self._send_response(200, {"status": "healthy", "server": "LibreOffice MCP Extension"})
+                self._send_response(200, {
+                    "status": "healthy",
+                    "server": "LibreOffice MCP Extension",
+                    "version": _get_version(),
+                })
             else:
                 self._send_response(404, {"error": "Not found"})
                 
@@ -90,12 +124,24 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
     
     def _handle_tool_execution(self, tool_name: str, parameters: Dict[str, Any]):
-        """Handle tool execution requests"""
+        """Handle tool execution requests.
+
+        Dispatches the UNO work to the VCL main thread via AsyncCallback
+        so that all UNO calls are thread-safe.
+        """
         try:
-            # Execute tool synchronously (MCP server methods are not async in this implementation)
-            result = asyncio.run(self.mcp_server.execute_tool(tool_name, parameters))
+            result = execute_on_main_thread(
+                self.mcp_server.execute_tool_sync,
+                tool_name, parameters,
+                timeout=30.0,
+            )
             self._send_response(200, result)
-            
+
+        except TimeoutError:
+            logger.error("Tool %s timed out waiting for main thread", tool_name)
+            self._send_response(504, {
+                "error": f"Tool '{tool_name}' timed out (main thread busy)"})
+
         except Exception as e:
             logger.error(f"Error executing tool {tool_name}: {e}")
             self._send_response(500, {"error": str(e)})
@@ -104,16 +150,17 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
         """Get server information"""
         return {
             "name": "LibreOffice MCP Extension",
-            "version": "1.0.0",
+            "version": _get_version(),
             "description": "MCP server integrated into LibreOffice",
             "endpoints": {
-                "GET /": "Server information",
+                "GET /": "Server information and agent instructions",
                 "GET /tools": "List available tools",
                 "GET /health": "Health check",
                 "POST /tools/{tool_name}": "Execute specific tool",
                 "POST /execute": "Execute tool (tool name in body)"
             },
-            "tools_count": len(self.mcp_server.tools)
+            "tools_count": len(self.mcp_server.tools),
+            "instructions": _load_agent_instructions(),
         }
     
     def _get_tools_list(self) -> Dict[str, Any]:
@@ -168,24 +215,31 @@ class AIInterface:
             if self.running:
                 logger.warning("Server is already running")
                 return
-            
-            # Create HTTP server
-            with socketserver.TCPServer(("", self.port), MCPRequestHandler) as server:
-                server.allow_reuse_address = True
-                self.server = server
-                self.running = True
-                
-                logger.info(f"Started MCP HTTP server on {self.host}:{self.port}")
-                
-                # Start server in background thread
-                self.server_thread = threading.Thread(
-                    target=self._run_server,
-                    daemon=True
-                )
-                self.server_thread.start()
-                
-                logger.info("MCP HTTP server started successfully")
-                
+
+            # Inject MCP server reference into handler class
+            MCPRequestHandler.mcp_server = get_mcp_server()
+
+            # Do NOT set allow_reuse_address on Windows - it allows multiple
+            # servers to shadow the same port, causing empty responses.
+            self.server = HTTPServer(
+                (self.host, self.port), MCPRequestHandler
+            )
+            self.running = True
+
+            logger.info(f"Started MCP HTTP server on {self.host}:{self.port}")
+
+            self.server_thread = threading.Thread(
+                target=self._run_server,
+                daemon=True
+            )
+            self.server_thread.start()
+
+            logger.info("MCP HTTP server started successfully")
+
+        except OSError as e:
+            logger.error(f"Failed to bind HTTP server to {self.host}:{self.port}: {e}")
+            self.running = False
+            raise
         except Exception as e:
             logger.error(f"Failed to start HTTP server: {e}")
             self.running = False

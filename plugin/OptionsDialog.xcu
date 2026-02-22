@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oor:component-data oor:name="OptionsDialog"
+                    oor:package="org.openoffice.Office"
+                    xmlns:oor="http://openoffice.org/2001/registry"
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <node oor:name="Nodes">
+        <node oor:name="org.mcp.libreoffice" oor:op="fuse">
+            <prop oor:name="Label">
+                <value xml:lang="en-US">MCP Server</value>
+            </prop>
+            <prop oor:name="AllModules">
+                <value>true</value>
+            </prop>
+            <node oor:name="Leaves">
+                <node oor:name="org.mcp.libreoffice.settings" oor:op="fuse">
+                    <prop oor:name="Id">
+                        <value>org.mcp.libreoffice.extension</value>
+                    </prop>
+                    <prop oor:name="Label">
+                        <value xml:lang="en-US">Server Settings</value>
+                    </prop>
+                    <prop oor:name="OptionsPage">
+                        <value>%origin%/dialogs/MCPSettings.xdl</value>
+                    </prop>
+                    <prop oor:name="EventHandlerService">
+                        <value>org.mcp.libreoffice.MCPOptionsHandler</value>
+                    </prop>
+                </node>
+            </node>
+        </node>
+    </node>
+
+</oor:component-data>

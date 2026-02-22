@@ -58,15 +58,23 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 brew install node openjdk
 ```
 
-### Windows (with Chocolatey)
-```bash
-# Required components
-choco install libreoffice python312
-# Then install UV manually from the website
+### Windows
 
-# Optional components
-choco install nodejs openjdk
+```powershell
+# Automatic (recommended):
+.\install.ps1
+
+# Or manually via winget:
+winget install Python.Python.3.12
+winget install TheDocumentFoundation.LibreOffice
+irm https://astral.sh/uv/install.ps1 | iex
+
+# Optional:
+winget install OpenJS.NodeJS.LTS
+winget install EclipseAdoptium.Temurin.21.JRE
 ```
+
+See [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for the full guide.
 
 ## 🔍 Verification Commands
 

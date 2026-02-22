@@ -9,7 +9,7 @@
         <!-- MCP Extension Protocol Handler -->
         <node oor:name="org.mcp.libreoffice.MCPExtension" oor:op="replace">
             <prop oor:name="Protocols" oor:type="oor:string-list">
-                <value>service:org.mcp.libreoffice.MCPExtension*</value>
+                <value>org.mcp.libreoffice:*</value>
             </prop>
         </node>
         

@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oor:component-schema xmlns:oor="http://openoffice.org/2001/registry"
+                      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      oor:name="Settings"
+                      oor:package="org.mcp.libreoffice"
+                      xml:lang="en-US">
+  <info>
+    <desc>Configuration for the LibreOffice MCP Server extension.</desc>
+  </info>
+  <component>
+    <group oor:name="Server">
+      <info>
+        <desc>MCP HTTP server settings.</desc>
+      </info>
+      <prop oor:name="AutoStart" oor:type="xs:boolean" oor:nillable="false">
+        <info>
+          <desc>Start the MCP server automatically when LibreOffice launches.</desc>
+        </info>
+        <value>true</value>
+      </prop>
+      <prop oor:name="Port" oor:type="xs:int" oor:nillable="false">
+        <info>
+          <desc>TCP port for the MCP HTTP server.</desc>
+        </info>
+        <constraints>
+          <minInclusive oor:value="1024">
+            <info>
+              <desc>Minimum port (avoid privileged ports).</desc>
+            </info>
+          </minInclusive>
+          <maxInclusive oor:value="65535">
+            <info>
+              <desc>Maximum port number.</desc>
+            </info>
+          </maxInclusive>
+        </constraints>
+        <value>8765</value>
+      </prop>
+      <prop oor:name="Host" oor:type="xs:string" oor:nillable="false">
+        <info>
+          <desc>Host address the MCP server binds to.</desc>
+        </info>
+        <value>localhost</value>
+      </prop>
+    </group>
+  </component>
+</oor:component-schema>

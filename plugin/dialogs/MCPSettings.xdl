@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog"
+            xmlns:script="http://openoffice.org/2000/script"
+            dlg:id="MCPSettings"
+            dlg:left="0" dlg:top="0"
+            dlg:width="260" dlg:height="185"
+            dlg:closeable="true"
+            dlg:withtitlebar="false">
+  <dlg:bulletinboard>
+
+    <!-- Server Settings group -->
+    <dlg:fixedline dlg:id="ServerLine"
+                   dlg:tab-index="0"
+                   dlg:left="6" dlg:top="6"
+                   dlg:width="248" dlg:height="8"
+                   dlg:value="MCP Server Settings"/>
+
+    <!-- Auto-start checkbox -->
+    <dlg:checkbox dlg:id="AutoStartCheck"
+                  dlg:tab-index="1"
+                  dlg:left="12" dlg:top="22"
+                  dlg:width="200" dlg:height="12"
+                  dlg:value="Start MCP server automatically when LibreOffice launches"
+                  dlg:checked="true"/>
+
+    <!-- Host label + field -->
+    <dlg:text dlg:id="HostLabel"
+              dlg:tab-index="2"
+              dlg:left="12" dlg:top="42"
+              dlg:width="40" dlg:height="10"
+              dlg:value="Host:"/>
+
+    <dlg:textfield dlg:id="HostField"
+                   dlg:tab-index="3"
+                   dlg:left="60" dlg:top="40"
+                   dlg:width="120" dlg:height="12"
+                   dlg:value="localhost"/>
+
+    <!-- Port label + field -->
+    <dlg:text dlg:id="PortLabel"
+              dlg:tab-index="4"
+              dlg:left="12" dlg:top="60"
+              dlg:width="40" dlg:height="10"
+              dlg:value="Port:"/>
+
+    <dlg:numericfield dlg:id="PortField"
+                      dlg:tab-index="5"
+                      dlg:left="60" dlg:top="58"
+                      dlg:width="60" dlg:height="12"
+                      dlg:decimal-accuracy="0"
+                      dlg:value-min="1024"
+                      dlg:value-max="65535"
+                      dlg:value="8765"/>
+
+    <!-- Info section -->
+    <dlg:fixedline dlg:id="InfoLine"
+                   dlg:tab-index="6"
+                   dlg:left="6" dlg:top="82"
+                   dlg:width="248" dlg:height="8"
+                   dlg:value="Information"/>
+
+    <dlg:text dlg:id="InfoText"
+              dlg:tab-index="7"
+              dlg:left="12" dlg:top="96"
+              dlg:width="240" dlg:height="30"
+              dlg:multiline="true"
+              dlg:value="The MCP server exposes LibreOffice document tools via HTTP for AI assistants. Changes take effect after restarting the server."/>
+
+    <dlg:text dlg:id="UrlText"
+              dlg:tab-index="8"
+              dlg:left="12" dlg:top="130"
+              dlg:width="240" dlg:height="10"
+              dlg:value="Health check: http://localhost:8765/health"/>
+
+  </dlg:bulletinboard>
+</dlg:window>

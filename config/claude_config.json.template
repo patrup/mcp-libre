@@ -9,7 +9,8 @@
       ],
       "cwd": "/path/to/mcp-libre",
       "env": {
-        "PYTHONPATH": "/path/to/mcp-libre/src"
+        "PYTHONPATH": "/path/to/mcp-libre/src",
+        "MCP_LIBREOFFICE_GUI": "0"
       }
     }
   }
