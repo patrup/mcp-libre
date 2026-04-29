@@ -15,8 +15,8 @@
     <release-notes>
         <src lang="en" xlink:href="release-notes-en.txt"/>
     </release-notes>
-    <dependencies>
-        <OpenOffice.org-minimal-version value="7.0" dep:name="OpenOffice.org 7.0"/>
+    <dependencies xmlns:lo="http://libreoffice.org/extensions/description/2011">
+        <lo:LibreOffice-minimal-version value="7.0" lo:name="LibreOffice 7.0"/>
     </dependencies>
     <registration>
         <simple-license accept-by="admin" default-license-id="this" suppress-on-update="true">

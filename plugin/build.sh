@@ -5,8 +5,8 @@
 
 set -e
 
-PLUGIN_DIR="/home/patrick/work/mcp/mcp-libre/plugin"
-BUILD_DIR="/home/patrick/work/mcp/mcp-libre/build"
+PLUGIN_DIR="${PLUGIN_DIR:-$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+BUILD_DIR="${BUILD_DIR:-$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/build}"
 EXTENSION_NAME="libreoffice-mcp-extension"
 VERSION="1.0.0"
 
@@ -28,8 +28,10 @@ zip -r "$BUILD_DIR/${EXTENSION_NAME}-${VERSION}.oxt" \
     META-INF/ \
     pythonpath/ \
     *.xml \
+    *.xcu \
     *.txt \
     -x "*.pyc" "*/__pycache__/*"
+zip -j "$BUILD_DIR/${EXTENSION_NAME}-${VERSION}.oxt" "$PLUGIN_DIR/../LICENSE"
 
 # Create a symlink for easier access
 ln -sf "${EXTENSION_NAME}-${VERSION}.oxt" "$BUILD_DIR/${EXTENSION_NAME}.oxt"

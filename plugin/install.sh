@@ -5,8 +5,8 @@
 
 set -e
 
-PLUGIN_DIR="/home/patrick/work/mcp/mcp-libre/plugin"
-BUILD_DIR="/home/patrick/work/mcp/mcp-libre/build"
+PLUGIN_DIR="${PLUGIN_DIR:-$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
+BUILD_DIR="${BUILD_DIR:-$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/build}"
 
 echo "🎯 LibreOffice MCP Extension - Installation & Usage Guide"
 echo "========================================================"
@@ -105,7 +105,7 @@ install_extension() {
     
     # Install new version
     echo "⬇️  Installing extension..."
-    unopkg add "$EXTENSION_FILE"
+    unopkg add --suppress-license "$EXTENSION_FILE"
     
     echo "✅ Extension installed successfully!"
     echo ""
