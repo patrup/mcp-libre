@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 import httpx
 from pydantic import BaseModel, Field
@@ -94,11 +94,12 @@ def _get_document_info(file_path: str) -> DocumentInfo:
         filename=path.name,
         format=path.suffix.lower().lstrip('.'),
         size_bytes=path.stat().st_size if path.exists() else 0,
-        modified_time=datetime.fromtimestamp(path.stat().st_mtime) if path.exists() else datetime.now(),
+        modified_time=datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat() if path.exists() else datetime.now(),
         exists=path.exists()
     )
 
 
+# modified_time = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat()
 # Core LibreOffice Tools
 
 @mcp.tool()
