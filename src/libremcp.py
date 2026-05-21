@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 import httpx
 from pydantic import BaseModel, Field
@@ -94,7 +94,7 @@ def _get_document_info(file_path: str) -> DocumentInfo:
         filename=path.name,
         format=path.suffix.lower().lstrip('.'),
         size_bytes=path.stat().st_size if path.exists() else 0,
-        modified_time=datetime.fromtimestamp(path.stat().st_mtime) if path.exists() else datetime.now(),
+        modified_time=datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc) if path.exists() else datetime.now(timezone.utc),
         exists=path.exists()
     )
 
@@ -1214,11 +1214,11 @@ def watch_document_changes(path: str, duration_seconds: int = 30) -> Dict[str, A
                 
                 if current_mtime > initial_mtime or current_size != initial_size:
                     change_info = {
-                        "timestamp": datetime.now().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                         "size_before": initial_size,
                         "size_after": current_size,
                         "size_change": current_size - initial_size,
-                        "modification_time": datetime.fromtimestamp(current_mtime).isoformat()
+                        "modification_time": datetime.fromtimestamp(current_mtime, tz=timezone.utc).isoformat()
                     }
                     changes_detected.append(change_info)
                     
@@ -1267,7 +1267,7 @@ def create_live_editing_session(path: str, auto_refresh: bool = True) -> Dict[st
             "document_name": path_obj.name,
             "opened_in_gui": open_result["success"],
             "auto_refresh_enabled": auto_refresh,
-            "created_at": datetime.now().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "instructions": {
                 "view_changes": "Document is open in LibreOffice GUI",
                 "make_mcp_changes": "Use insert_text_at_position, convert_document, etc.",
