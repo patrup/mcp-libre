@@ -94,7 +94,7 @@ def _get_document_info(file_path: str) -> DocumentInfo:
         filename=path.name,
         format=path.suffix.lower().lstrip('.'),
         size_bytes=path.stat().st_size if path.exists() else 0,
-        modified_time=datetime.fromtimestamp(path.stat().st_mtime) if path.exists() else datetime.now(),
+        modified_time=datetime.fromtimestamp(path.stat().st_mtime).astimezone() if path.exists() else datetime.now().astimezone(),
         exists=path.exists()
     )
 
@@ -449,13 +449,30 @@ def read_spreadsheet_data(path: str, sheet_name: Optional[str] = None, max_rows:
             
             # Read CSV data
             import csv
+            import locale
             data = []
-            with open(csv_file, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                for i, row in enumerate(reader):
-                    if i >= max_rows:
+            decoded_successfully = False
+            for enc in ['utf-8', locale.getpreferredencoding(), 'latin-1']:
+                try:
+                    with open(csv_file, 'r', encoding=enc) as f:
+                        temp_data = []
+                        reader = csv.reader(f)
+                        for i, row in enumerate(reader):
+                            if i >= max_rows:
+                                break
+                            temp_data.append(row)
+                        data = temp_data
+                        decoded_successfully = True
                         break
-                    data.append(row)
+                except (UnicodeDecodeError, LookupError):
+                    continue
+            if not decoded_successfully:
+                with open(csv_file, 'r', encoding='utf-8', errors='replace') as f:
+                    reader = csv.reader(f)
+                    for i, row in enumerate(reader):
+                        if i >= max_rows:
+                            break
+                        data.append(row)
             
             row_count = len(data)
             col_count = max(len(row) for row in data) if data else 0
