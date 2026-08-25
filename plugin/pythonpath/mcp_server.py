@@ -5,11 +5,15 @@ This module implements an embedded MCP server that integrates with LibreOffice
 via the UNO API, providing real-time document manipulation capabilities.
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import asyncio
 import json
 import logging
 from typing import Dict, Any, Optional, List
-from .uno_bridge import UNOBridge
+from uno_bridge import UNOBridge
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

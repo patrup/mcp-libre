@@ -5,8 +5,9 @@
 
 set -e
 
-PLUGIN_DIR="/home/patrick/work/mcp/mcp-libre/plugin"
-BUILD_DIR="/home/patrick/work/mcp/mcp-libre/build"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_DIR="$SCRIPT_DIR"
+BUILD_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)/build"
 EXTENSION_NAME="libreoffice-mcp-extension"
 VERSION="1.0.0"
 
@@ -29,6 +30,7 @@ zip -r "$BUILD_DIR/${EXTENSION_NAME}-${VERSION}.oxt" \
     pythonpath/ \
     *.xml \
     *.txt \
+    LICENSE \
     -x "*.pyc" "*/__pycache__/*"
 
 # Create a symlink for easier access

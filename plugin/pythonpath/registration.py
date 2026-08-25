@@ -4,6 +4,10 @@ LibreOffice MCP Extension - Registration Module
 This module handles the registration and lifecycle of the LibreOffice MCP extension.
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import uno
 import unohelper
 import logging
@@ -15,6 +19,21 @@ from com.sun.star.lang import XServiceInfo
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Pre-import the chain that touches com.sun.star.* types while we're still on
+# the main/loader thread, which has a properly attached UNO bridge context.
+# The MCP server is later started on a background threading.Thread, and that
+# thread has no UNO context of its own -- pyuno's com.sun.star.* import hook
+# fails there ("No module named 'com'") unless the modules are already cached
+# in sys.modules from a successful import done here first.
+try:
+    import uno_bridge  # noqa: F401
+    import mcp_server  # noqa: F401
+    import ai_interface  # noqa: F401
+    logger.info("Pre-imported uno_bridge/mcp_server/ai_interface on loader thread")
+except Exception as _preimport_exc:
+    logger.error(f"Pre-import failed: {_preimport_exc}")
+    logger.error(traceback.format_exc())
 
 
 # Implementation name and service name for the extension
@@ -81,8 +100,8 @@ class MCPExtension(unohelper.Base, XJobExecutor, XServiceInfo):
                 return
             
             # Import modules here to avoid import issues during extension loading
-            from .ai_interface import start_ai_interface
-            from .mcp_server import get_mcp_server
+            from ai_interface import start_ai_interface
+            from mcp_server import get_mcp_server
             
             # Initialize MCP server
             self.mcp_server = get_mcp_server()
@@ -113,7 +132,7 @@ class MCPExtension(unohelper.Base, XJobExecutor, XServiceInfo):
             
             # Stop AI interface
             if self.ai_interface:
-                from .ai_interface import stop_ai_interface
+                from ai_interface import stop_ai_interface
                 stop_ai_interface()
                 self.ai_interface = None
                 logger.info("AI interface stopped")

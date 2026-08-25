@@ -104,3 +104,4 @@ local_config.json
 # MCP specific
 mcp_test_*
 temp_documents/
+

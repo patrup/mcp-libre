@@ -5,6 +5,7 @@ This demonstrates basic usage of the server tools
 """
 
 import asyncio
+import pytest
 import json
 import sys
 import os
@@ -15,6 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src
 from mcp.shared.memory import create_connected_server_and_client_session as client_session
 from libremcp import mcp
 
+@pytest.mark.asyncio
 async def test_mcp_client():
     """Test the MCP server by calling its tools as a client would"""
     print("Testing LibreOffice MCP Server Tools")

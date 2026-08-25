@@ -5,6 +5,10 @@ This module provides HTTP API interface for external AI assistants to communicat
 with the LibreOffice MCP server.
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import asyncio
 import json
 import logging
@@ -14,7 +18,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import socketserver
 
-from .mcp_server import get_mcp_server
+from mcp_server import get_mcp_server
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -169,22 +173,26 @@ class AIInterface:
                 logger.warning("Server is already running")
                 return
             
-            # Create HTTP server
-            with socketserver.TCPServer(("", self.port), MCPRequestHandler) as server:
-                server.allow_reuse_address = True
-                self.server = server
-                self.running = True
-                
-                logger.info(f"Started MCP HTTP server on {self.host}:{self.port}")
-                
-                # Start server in background thread
-                self.server_thread = threading.Thread(
-                    target=self._run_server,
-                    daemon=True
-                )
-                self.server_thread.start()
-                
-                logger.info("MCP HTTP server started successfully")
+            # Create HTTP server. Deliberately NOT a `with` block: the server
+            # must stay open for the lifetime of the background thread below,
+            # but `TCPServer.__exit__` calls server_close() as soon as the
+            # `with` block ends -- which was happening right after the thread
+            # started, closing the listening socket out from under it.
+            socketserver.TCPServer.allow_reuse_address = True
+            server = socketserver.TCPServer(("", self.port), MCPRequestHandler)
+            self.server = server
+            self.running = True
+
+            logger.info(f"Started MCP HTTP server on {self.host}:{self.port}")
+
+            # Start server in background thread
+            self.server_thread = threading.Thread(
+                target=self._run_server,
+                daemon=True
+            )
+            self.server_thread.start()
+
+            logger.info("MCP HTTP server started successfully")
                 
         except Exception as e:
             logger.error(f"Failed to start HTTP server: {e}")

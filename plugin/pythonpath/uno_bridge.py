@@ -9,8 +9,6 @@ import uno
 import unohelper
 from com.sun.star.beans import PropertyValue
 from com.sun.star.text import XTextDocument
-from com.sun.star.sheet import XSpreadsheetDocument
-from com.sun.star.presentation import XPresentationDocument
 from com.sun.star.document import XDocumentEventListener
 from com.sun.star.awt import XActionListener
 from typing import Any, Optional, Dict, List
@@ -20,6 +18,25 @@ import traceback
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Calc/Impress type libraries aren't always loaded in every UNO context this
+# extension runs in (e.g. during unopkg's own registration pass, or a
+# Writer-only session). These are only used for isinstance() checks below, so
+# fall back to an unmatchable sentinel class rather than hard-failing the
+# whole module -- Writer support (XTextDocument, imported above) still works.
+try:
+    from com.sun.star.sheet import XSpreadsheetDocument
+except ImportError:
+    logger.warning("com.sun.star.sheet.XSpreadsheetDocument unavailable in this context")
+    class XSpreadsheetDocument:
+        pass
+
+try:
+    from com.sun.star.presentation import XPresentationDocument
+except ImportError:
+    logger.warning("com.sun.star.presentation.XPresentationDocument unavailable in this context")
+    class XPresentationDocument:
+        pass
 
 
 class UNOBridge:
@@ -93,11 +110,11 @@ class UNOBridge:
             }
             
             # Add document-specific information
-            if isinstance(doc, XTextDocument):
+            if self._is_writer(doc):
                 text = doc.getText()
                 info["word_count"] = len(text.getString().split())
                 info["character_count"] = len(text.getString())
-            elif isinstance(doc, XSpreadsheetDocument):
+            elif self._is_calc(doc):
                 sheets = doc.getSheets()
                 info["sheet_count"] = sheets.getCount()
                 info["sheet_names"] = [sheets.getByIndex(i).getName() 
@@ -129,7 +146,7 @@ class UNOBridge:
                 return {"success": False, "error": "No active document"}
             
             # Handle Writer documents
-            if isinstance(doc, XTextDocument):
+            if self._is_writer(doc):
                 text_obj = doc.getText()
                 
                 if position is None:
@@ -168,7 +185,7 @@ class UNOBridge:
             if doc is None:
                 doc = self.get_active_document()
             
-            if not doc or not isinstance(doc, XTextDocument):
+            if not doc or not self._is_writer(doc):
                 return {"success": False, "error": "No Writer document available"}
             
             # Get current selection
@@ -299,7 +316,7 @@ class UNOBridge:
             if not doc:
                 return {"success": False, "error": "No document available"}
             
-            if isinstance(doc, XTextDocument):
+            if self._is_writer(doc):
                 text = doc.getText().getString()
                 return {"success": True, "content": text, "length": len(text)}
             else:
@@ -309,13 +326,37 @@ class UNOBridge:
             logger.error(f"Failed to get text content: {e}")
             return {"success": False, "error": str(e)}
     
+    @staticmethod
+    def _is_writer(doc: Any) -> bool:
+        """Check if doc is a Writer text document.
+
+        NOTE: isinstance() against UNO interface classes returns False on
+        LibreOffice 26.2 (Python bridge), so we detect via supportsService()
+        using the canonical service names.
+        """
+        if doc is None or not hasattr(doc, "supportsService"):
+            return False
+        return bool(doc.supportsService("com.sun.star.text.TextDocument"))
+
+    @staticmethod
+    def _is_calc(doc: Any) -> bool:
+        if doc is None or not hasattr(doc, "supportsService"):
+            return False
+        return bool(doc.supportsService("com.sun.star.sheet.SpreadsheetDocument"))
+
+    @staticmethod
+    def _is_impress(doc: Any) -> bool:
+        if doc is None or not hasattr(doc, "supportsService"):
+            return False
+        return bool(doc.supportsService("com.sun.star.presentation.PresentationDocument"))
+
     def _get_document_type(self, doc: Any) -> str:
         """Determine document type"""
-        if isinstance(doc, XTextDocument):
+        if self._is_writer(doc):
             return "writer"
-        elif isinstance(doc, XSpreadsheetDocument):
+        elif self._is_calc(doc):
             return "calc"
-        elif isinstance(doc, XPresentationDocument):
+        elif self._is_impress(doc):
             return "impress"
         else:
             return "unknown"
