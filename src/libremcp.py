@@ -8,6 +8,8 @@ and other LibreOffice formats.
 
 import asyncio
 import json
+import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -62,26 +64,61 @@ class SpreadsheetData(BaseModel):
 
 
 # Helper functions
+MACOS_SOFFICE_PATH = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+
+
+def _libreoffice_executables() -> List[str]:
+    """Return available LibreOffice executables in priority order:
+    LIBREOFFICE_PATH (if set and executable), PATH candidates, macOS app bundle."""
+    candidates = []
+    env_path = os.environ.get("LIBREOFFICE_PATH")
+    if env_path and os.path.isfile(env_path) and os.access(env_path, os.X_OK):
+        candidates.append(env_path)
+    for name in ['libreoffice', 'loffice', 'soffice']:
+        found = shutil.which(name)
+        if found:
+            candidates.append(found)
+    if os.path.isfile(MACOS_SOFFICE_PATH) and os.access(MACOS_SOFFICE_PATH, os.X_OK):
+        candidates.append(MACOS_SOFFICE_PATH)
+    # Drop duplicates (e.g. LIBREOFFICE_PATH also found via PATH), keep order
+    return list(dict.fromkeys(candidates))
+
+
+def _libreoffice_executable() -> str:
+    """Return the preferred LibreOffice executable or raise FileNotFoundError"""
+    executables = _libreoffice_executables()
+    if not executables:
+        raise FileNotFoundError(
+            "LibreOffice executable not found. Please install LibreOffice "
+            "or set LIBREOFFICE_PATH to the soffice binary."
+        )
+    return executables[0]
+
+
 def _run_libreoffice_command(args: List[str], timeout: int = 30) -> subprocess.CompletedProcess:
     """Run a LibreOffice command with proper error handling"""
     try:
-        # Try different common LibreOffice executable names
-        for executable in ['libreoffice', 'loffice', 'soffice']:
+        result = None
+        for executable in _libreoffice_executables():
             try:
-                cmd = [executable] + args
                 result = subprocess.run(
-                    cmd,
+                    [executable] + args,
                     capture_output=True,
                     text=True,
                     timeout=timeout,
                     check=False
                 )
-                if result.returncode == 0 or executable == 'soffice':  # soffice might work even if return code != 0
+                if result.returncode == 0:
                     return result
             except FileNotFoundError:
                 continue
-        
-        raise FileNotFoundError("LibreOffice executable not found. Please install LibreOffice.")
+        if result is None:
+            raise FileNotFoundError(
+                "LibreOffice executable not found. Please install LibreOffice "
+                "or set LIBREOFFICE_PATH to the soffice binary."
+            )
+        # soffice might work even if return code != 0 - return the last attempt
+        return result
     except subprocess.TimeoutExpired:
         raise TimeoutError(f"LibreOffice command timed out after {timeout} seconds")
 
@@ -1105,8 +1142,8 @@ def open_document_in_libreoffice(path: str, readonly: bool = False) -> Dict[str,
     
     try:
         # Build command to open LibreOffice with GUI
-        cmd = ['libreoffice']
-        
+        cmd = [_libreoffice_executable()]
+
         if readonly:
             cmd.append('--view')
         
@@ -1158,7 +1195,7 @@ def refresh_document_in_libreoffice(path: str) -> Dict[str, Any]:
         try:
             # This is a more advanced approach that may work if LibreOffice is running
             result = subprocess.run([
-                'libreoffice', '--invisible', '--headless',
+                _libreoffice_executable(), '--invisible', '--headless',
                 '--accept=socket,host=127.0.0.1,port=2002;urp;',
                 '--norestore', '--nologo'
             ], timeout=2, capture_output=True)
