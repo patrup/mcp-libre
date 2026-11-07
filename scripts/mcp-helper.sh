@@ -119,14 +119,14 @@ check_dependencies() {
     fi
     echo ""
     
-    # Check Java (Optional - for advanced LibreOffice features)
-    echo "Java (Optional - for advanced LibreOffice features like PDF generation):"
+    # Check Java (optional LibreOffice component)
+    echo "Java (Optional LibreOffice component):"
     if command -v java >/dev/null 2>&1; then
         local java_version=$(java -version 2>&1 | head -1)
         print_status "Java is installed: $java_version"
-        print_status "Advanced LibreOffice features available"
+        print_status "Java is available"
     else
-        print_warning "Java not found. Some LibreOffice features may be limited."
+        print_warning "Java not found. The external MCP server does not require Java."
         echo "  Ubuntu/Debian: sudo apt install default-jre"
         echo "  macOS: brew install openjdk"
         echo "  Windows: Download from https://adoptium.net/"
@@ -204,7 +204,7 @@ show_requirements() {
     
     echo "2. Python (Version 3.12 or higher)"
     echo "   Purpose: Runtime environment for MCP server"
-    echo "   Features: FastMCP framework, async operations"
+    echo "   Features: MCP SDK 2.x framework, async operations"
     echo "   Install:"
     echo "     • Ubuntu/Debian: sudo apt install python3.12 python3.12-venv"
     echo "     • macOS: brew install python@3.12"
@@ -232,9 +232,8 @@ show_requirements() {
     echo "     • Windows: https://nodejs.org/"
     echo ""
     
-    echo "5. Java Runtime Environment (JRE 11+)"
-    echo "   Purpose: Advanced LibreOffice features"
-    echo "   Features: PDF generation, complex document processing"
+    echo "5. Java Runtime Environment (optional)"
+    echo "   Purpose: Optional LibreOffice component"
     echo "   Install:"
     echo "     • Ubuntu/Debian: sudo apt install default-jre"
     echo "     • macOS: brew install openjdk"
@@ -256,7 +255,7 @@ show_requirements() {
     echo ""
     
     echo "• Direct MCP Clients"
-    echo "  - Python applications using FastMCP"
+    echo "  - Python applications using the MCP SDK"
     echo "  - Custom integrations via stdio transport"
     echo ""
     
@@ -309,7 +308,7 @@ show_info() {
     echo -e "${BLUE}File Structure:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "• libremcp.py - Main MCP server implementation"
-    echo "• main.py - Entry point script"
+    echo "• src/main.py - External MCP server entry point"
     echo "• test_client.py - Test client for validation"
     echo "• mcp-helper.sh - Management and testing helper"
     echo "• pyproject.toml - Project configuration"

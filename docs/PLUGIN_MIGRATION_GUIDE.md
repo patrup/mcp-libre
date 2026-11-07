@@ -1,14 +1,16 @@
-# 🔄 Migration Guide: External Server → LibreOffice Plugin
+# 🔄 Optional Embedded Plugin Guide
 
 ## 🎯 Overview
 
-This guide helps you migrate from the external MCP server to the new LibreOffice plugin extension, which provides significantly better performance and capabilities.
+This guide covers the optional embedded LibreOffice HTTP/UNO plugin. The
+external MCP SDK stdio server remains supported and runs with
+`uv run python src/main.py`.
 
 ## 📊 Benefits of Migration
 
 | Feature | External Server | LibreOffice Plugin |
 |---------|----------------|-------------------|
-| **Performance** | ⭐⭐ (subprocess calls) | ⭐⭐⭐⭐⭐ (direct UNO API) |
+| **Integration model** | MCP SDK stdio server | Embedded HTTP/UNO extension |
 | **Real-time Editing** | ⭐⭐ (file-based) | ⭐⭐⭐⭐⭐ (live objects) |
 | **Startup Time** | ⭐⭐ (LibreOffice startup) | ⭐⭐⭐⭐⭐ (instant) |
 | **Multi-document** | ⭐⭐ (file operations) | ⭐⭐⭐⭐⭐ (all open docs) |
@@ -300,7 +302,7 @@ curl -X POST http://localhost:8765/tools/get_document_info_live
 
 Once migrated successfully, you'll have:
 
-✅ **10x Performance Improvement** - Direct UNO API access  
+✅ **Direct UNO API access**
 ✅ **Real-time Visual Feedback** - See changes instantly  
 ✅ **Native Integration** - LibreOffice menu controls  
 ✅ **Multi-document Support** - Work with all open documents  

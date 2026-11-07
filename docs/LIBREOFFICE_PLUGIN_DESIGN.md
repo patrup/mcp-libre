@@ -1,4 +1,8 @@
-# LibreOffice Plugin Architecture Design
+# LibreOffice Plugin Architecture Design (Historical Proposal)
+
+> The shipped `plugin/` directory is a separate custom HTTP/UNO integration,
+> not an MCP SDK server. This document describes an earlier proposal; use
+> `plugin/README.md` for current extension behavior.
 
 ## 🎯 **Redesigning as a LibreOffice Plugin: Comprehensive Analysis**
 
@@ -154,11 +158,11 @@ class UNOBridge:
 
 #### **2. MCP Server Integration (mcp_server.py)**
 ```python
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from .uno_bridge import UNOBridge
 
 # Initialize embedded MCP server
-mcp = FastMCP("LibreOffice Plugin MCP Server")
+mcp = MCPServer("LibreOffice Plugin MCP Server")
 uno_bridge = UNOBridge()
 
 @mcp.tool()

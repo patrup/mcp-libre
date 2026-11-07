@@ -8,9 +8,10 @@ This document describes the complete LibreOffice Model Context Protocol (MCP) se
 
 ```
 mcp-libre/
-├── libremcp.py              # Main MCP server implementation (764 lines)
-├── main.py                  # Entry point for the server
-├── test_client.py           # Client test script for demonstration
+├── src/libremcp.py          # External MCP SDK 2.x server implementation
+├── src/main.py              # Stdio entry point
+├── tests/                   # Automated MCP and LibreOffice tests
+├── test-output/             # Preserved smoke-test artifacts
 ├── pyproject.toml           # Project configuration and dependencies
 ├── README.md                # Comprehensive documentation
 ├── EXAMPLES.md              # Usage examples and tutorials
@@ -84,7 +85,7 @@ mcp-libre/
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-- LibreOffice (24.2.7.2 or later)
+- LibreOffice (24.2+)
 - Python 3.12+
 - UV package manager
 - Node.js/NPX (for Super Assistant integration)
@@ -98,9 +99,10 @@ chmod +x mcp-helper.sh     # Make helper script executable
 
 ### Testing
 ```bash
-./mcp-helper.sh check      # Check dependencies
-./mcp-helper.sh test       # Test functionality
-./mcp-helper.sh demo       # Run interactive demo
+./mcp-helper.sh check                    # Check dependencies
+uv run pytest -q                         # Run automated tests
+uv run pytest -q tests/test_stdio_protocol.py
+uv run python src/main.py --test         # LibreOffice smoke test
 ```
 
 ## 🔗 Integration Options
@@ -112,10 +114,10 @@ Configuration file: `claude_config.json`
   "mcpServers": {
     "libreoffice": {
       "command": "uv",
-      "args": ["run", "python", "<PATH_TO>/mcp-libre/main.py"],
+      "args": ["run", "python", "<PATH_TO>/mcp-libre/src/main.py"],
       "cwd": "<PATH_TO>/mcp-libre",
       "env": {
-        "PYTHONPATH": "<PATH_TO>/mcp-libre"
+        "PYTHONPATH": "<PATH_TO>/mcp-libre/src"
       }
     }
   }
@@ -141,15 +143,18 @@ Extension configuration:
 ### 3. Direct MCP Client
 ```python
 import asyncio
-from mcp.shared.memory import create_connected_server_and_client_session
+from mcp import ClientSession
+from mcp.client._memory import InMemoryTransport
 from libremcp import mcp
 
-async with client_session(mcp._mcp_server) as client:
-    result = await client.call_tool("create_document", {
-        "path": "/tmp/test.odt",
-        "doc_type": "writer",
-        "content": "Hello, World!"
-    })
+async with InMemoryTransport(mcp) as (read_stream, write_stream):
+    async with ClientSession(read_stream, write_stream) as client:
+        await client.initialize()
+        result = await client.call_tool("create_document", {
+            "path": "/tmp/test.odt",
+            "doc_type": "writer",
+            "content": "Hello, World!"
+        })
 ```
 
 ## 🎯 Usage Examples

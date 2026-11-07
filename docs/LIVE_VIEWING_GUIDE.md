@@ -2,7 +2,10 @@
 
 ## Overview
 
-The LibreOffice MCP Server supports **live viewing** - seeing your document changes in real-time as you modify them through AI assistants like Claude Desktop. This creates a seamless workflow where you can watch your documents update live while giving natural language commands.
+The external server provides file-based live-viewing helpers. Refresh behavior
+depends on the LibreOffice installation and document state; it is not a
+guaranteed real-time UNO session. For an embedded active-document integration,
+see `plugin/README.md`.
 
 ## 🎯 Live Viewing Options
 
@@ -187,7 +190,7 @@ Monitors a document for changes and reports them.
 ### Run the Live Viewing Demo
 ```bash
 # Comprehensive demonstration
-uv run python demo_live_viewing.py
+uv run python examples/demo_live_viewing.py
 
 # Quick test of live features
 ./mcp-helper.sh demo

@@ -16,12 +16,11 @@ from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass
 from datetime import datetime
 
-import httpx
 from pydantic import BaseModel, Field
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.resources.templates import ResourceSecurity
 
-# Initialize FastMCP server
-mcp = FastMCP("LibreOffice MCP Server")
+mcp = MCPServer("LibreOffice MCP Server")
 
 
 # Data models for structured responses
@@ -76,8 +75,7 @@ def _run_libreoffice_command(args: List[str], timeout: int = 30) -> subprocess.C
                     timeout=timeout,
                     check=False
                 )
-                if result.returncode == 0 or executable == 'soffice':  # soffice might work even if return code != 0
-                    return result
+                return result
             except FileNotFoundError:
                 continue
         
@@ -156,33 +154,7 @@ def create_document(path: str, doc_type: str = "writer", content: str = "") -> D
                     converted_file.rename(path_obj)
                 else:
                     # If conversion failed, create a basic ODT file manually
-                    # This is a minimal ODT structure
-                    import zipfile
-                    import xml.etree.ElementTree as ET
-                    
-                    # Create a minimal ODT file
-                    with zipfile.ZipFile(path_obj, 'w', zipfile.ZIP_DEFLATED) as zf:
-                        # Add mimetype
-                        zf.writestr('mimetype', 'application/vnd.oasis.opendocument.text')
-                        
-                        # Add META-INF/manifest.xml
-                        manifest = '''<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
- <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/>
- <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>'''
-                        zf.writestr('META-INF/manifest.xml', manifest)
-                        
-                        # Add content.xml with the text
-                        content_xml = f'''<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
- <office:body>
-  <office:text>
-   <text:p>{content}</text:p>
-  </office:text>
- </office:body>
-</office:document-content>'''
-                        zf.writestr('content.xml', content_xml)
+                    _create_minimal_odt(path_obj, content)
                 
             finally:
                 # Clean up temporary file
@@ -762,7 +734,10 @@ def list_documents() -> List[str]:
     return sorted(documents)
 
 
-@mcp.resource("document://{path}")
+@mcp.resource(
+    "document://{+path}",
+    security=ResourceSecurity(exempt_params={"path"}),
+)
 def get_document_content(path: str) -> str:
     """Get the text content of a specific document"""
     try:
@@ -966,7 +941,8 @@ def main():
         if arg == "--test":
             # Test mode - run some basic functionality tests
             print("🧪 Running LibreOffice MCP Server tests...")
-            asyncio.run(test_server())
+            if not asyncio.run(test_server()):
+                sys.exit(1)
             return
         
         elif arg == "--help" or arg == "-h":
@@ -1007,7 +983,7 @@ def main():
         sys.exit(1)
 
 
-async def test_server():
+async def test_server() -> bool:
     """Test the server functionality"""
     print("Testing LibreOffice MCP Server...")
     print("=" * 50)
@@ -1015,10 +991,13 @@ async def test_server():
     # First test LibreOffice installation
     if not await test_libreoffice_installation():
         print("❌ LibreOffice installation test failed")
-        return
+        return False
     
     # Test creating a document
-    test_doc = "/tmp/test_document.odt"
+    output_directory = Path.cwd() / "test-output"
+    output_directory.mkdir(exist_ok=True)
+    test_doc = str(output_directory / "test_document.odt")
+    pdf_path = str(output_directory / "test_document.pdf")
     try:
         print("\nTesting document creation...")
         result = create_document(test_doc, "writer", "This is a test document.\n\nHello, LibreOffice!")
@@ -1031,12 +1010,12 @@ async def test_server():
         
         # Test converting to PDF
         print("Testing document conversion...")
-        pdf_path = "/tmp/test_document.pdf"
         conversion = convert_document(test_doc, pdf_path, "pdf")
         if conversion.success:
             print(f"✓ Conversion to PDF: Success")
         else:
-            print(f"⚠ Conversion to PDF: Failed - {conversion.error_message}")
+            print(f"❌ Conversion to PDF: Failed - {conversion.error_message}")
+            return False
         
         # Test document statistics
         print("Testing document statistics...")
@@ -1044,19 +1023,13 @@ async def test_server():
         print(f"✓ Document statistics: {stats['content_stats']['word_count']} words, {stats['content_stats']['sentence_count']} sentences")
         
         print("\n✅ All tests passed!")
+        return True
         
     except Exception as e:
         print(f"❌ Test failed: {str(e)}")
         import traceback
         traceback.print_exc()
-    
-    finally:
-        # Clean up test files
-        for test_file in [test_doc, "/tmp/test_document.pdf"]:
-            try:
-                Path(test_file).unlink(missing_ok=True)
-            except:
-                pass
+        return False
 
 
 # Test LibreOffice functionality directly

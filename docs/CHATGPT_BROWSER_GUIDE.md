@@ -92,7 +92,7 @@ Create a web interface that:
      "mcpServers": {
        "libreoffice": {
          "command": "uv",
-         "args": ["run", "python", "<PATH_TO>/mcp-libre/main.py"],
+         "args": ["run", "python", "<PATH_TO>/mcp-libre/src/main.py"],
          "cwd": "<PATH_TO>/mcp-libre"
        }
      }

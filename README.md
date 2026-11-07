@@ -4,7 +4,7 @@ A comprehensive Model Context Protocol (MCP) server that provides tools and reso
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![LibreOffice](https://img.shields.io/badge/LibreOffice-24.2+-green.svg)](https://www.libreoffice.org/)
-[![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-orange.svg)](https://spec.modelcontextprotocol.io/)
+[![MCP SDK](https://img.shields.io/badge/MCP%20SDK-2.x-orange.svg)](https://py.sdk.modelcontextprotocol.io/)
 
 ## 📂 Repository Structure
 
@@ -21,12 +21,10 @@ For detailed information, see [`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_S
 
 ## 🚀 Features
 
-### LibreOffice Extension (Plugin) - NEW! 🎉
+### Optional LibreOffice Extension
 - **Native Integration**: Embedded MCP server directly in LibreOffice
 - **Real-time Editing**: Live document manipulation with instant visual feedback
-- **Performance**: 10x faster than external server (direct UNO API access)
 - **Multi-document**: Work with all open LibreOffice documents
-- **Auto-start**: Automatically available when LibreOffice starts
 - **HTTP API**: External AI assistant access via localhost:8765
 
 ### Document Operations
@@ -95,26 +93,23 @@ For detailed installation instructions for all platforms, run:
 
 ### Test the Server
 ```bash
-# Run functionality tests
-./mcp-helper.sh test
+# Run the automated suite
+uv run pytest -q
 
-# Run interactive demo
-./mcp-helper.sh demo
+# Exercise the actual stdio server process
+uv run pytest -q tests/test_stdio_protocol.py
+
+# Run the LibreOffice smoke test; artifacts remain in test-output/
+uv run python src/main.py --test
 ```
 
 ### Start MCP Server
 ```bash
-# Standard MCP mode (stdio)
-python src/main.py
-
-# Or using UV
+# MCP stdio mode
 uv run python src/main.py
 
 # Show help and options
-python src/main.py --help
-
-# Run tests
-python src/main.py --test
+uv run python src/main.py --help
 ```
 
 ### Integration with Super Assistant
@@ -159,9 +154,10 @@ python src/main.py --test
 
 ## 🔗 Integration Options
 
-### 1. LibreOffice Extension (NEW - Recommended!) 🎉
+### 1. LibreOffice Extension (optional)
 
-**The most powerful and efficient way to use the MCP server:**
+The extension is a separate embedded HTTP/UNO integration; it is not the external
+MCP SDK stdio server started by `src/main.py`.
 
 ```bash
 # Build and install the LibreOffice extension
@@ -172,8 +168,7 @@ cd plugin/
 ./install.sh test
 ```
 
-**Benefits of the Extension:**
-- **10x Performance**: Direct UNO API access (no subprocess overhead)
+**Extension capabilities:**
 - **Real-time Editing**: Live document manipulation in open LibreOffice windows
 - **Native Integration**: Appears in LibreOffice Tools menu
 - **Multi-document Support**: Work with all open documents simultaneously
@@ -211,15 +206,18 @@ npx @srbhptl39/mcp-superassistant-proxy@latest --config ~/Documents/mcp/mcp.conf
 
 ### 4. Direct MCP Client
 ```python
-from mcp.shared.memory import create_connected_server_and_client_session
+from mcp import ClientSession
+from mcp.client._memory import InMemoryTransport
 from libremcp import mcp
 
-async with client_session(mcp._mcp_server) as client:
-    result = await client.call_tool("create_document", {
-        "path": "/tmp/test.odt",
-        "doc_type": "writer",
-        "content": "Hello, World!"
-    })
+async with InMemoryTransport(mcp) as (read_stream, write_stream):
+    async with ClientSession(read_stream, write_stream) as client:
+        await client.initialize()
+        result = await client.call_tool("create_document", {
+            "path": "/tmp/test.odt",
+            "doc_type": "writer",
+            "content": "Hello, World!"
+        })
 ```
 
 ## 🎨 Usage Examples
@@ -280,15 +278,22 @@ cd plugin/
 # Check dependencies and verify setup
 ./mcp-helper.sh check
 
-# Run built-in functionality tests
+# Run the LibreOffice smoke test
 ./mcp-helper.sh test
 
-# Interactive demo of all capabilities
-./mcp-helper.sh demo
+# Run the automated test suite
+uv run pytest -q
+
+# Test the real stdio protocol
+uv run pytest -q tests/test_stdio_protocol.py
 
 # Test specific functionality directly
-uv run python libremcp.py --test
+uv run python src/main.py --test
 ```
+
+The smoke test writes `test_document.odt` and, on successful export,
+`test_document.pdf` to `test-output/`. The stdio test retains
+`mcp-stdio-smoke.odt` there as well.
 
 ## 🔧 Configuration
 
@@ -346,14 +351,13 @@ search_paths = [
 libreoffice --version
 libreoffice --headless --help
 
-# Test conversion manually
-libreoffice --headless --convert-to pdf document.odt
+# Test conversion manually in a directory LibreOffice can access
+libreoffice --headless --convert-to pdf --outdir test-output document.odt
 ```
 
 ### Java Warnings
-- Java warnings are usually non-fatal
-- Core functionality works without Java
-- Install Java for full LibreOffice features
+- Java warnings are usually non-fatal.
+- Java is not required by the external MCP server or its PDF smoke test.
 
 ### Permission Errors
 - Check file and directory permissions
@@ -384,7 +388,7 @@ For other license options, see [LICENSE_OPTIONS.md](LICENSE_OPTIONS.md).
 
 - **MCP Specification**: https://spec.modelcontextprotocol.io/
 - **LibreOffice**: https://www.libreoffice.org/
-- **FastMCP Framework**: https://github.com/modelcontextprotocol/python-sdk
+- **MCP Python SDK 2.x**: https://py.sdk.modelcontextprotocol.io/
 
 ## 📞 Support
 

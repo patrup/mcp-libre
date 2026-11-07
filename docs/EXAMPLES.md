@@ -212,7 +212,7 @@ Add this to your Claude Desktop configuration file:
   "mcpServers": {
     "libreoffice": {
       "command": "uv",
-      "args": ["run", "python", "/path/to/mcp-libre/main.py"],
+      "args": ["run", "python", "/path/to/mcp-libre/src/main.py"],
       "cwd": "/path/to/mcp-libre",
       "env": {
         "PYTHONPATH": "/path/to/mcp-libre"

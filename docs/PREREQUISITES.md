@@ -28,12 +28,6 @@
 - **macOS**: `brew install node`
 - **Windows**: [Download from nodejs.org](https://nodejs.org/)
 
-### 5. Java Runtime Environment (JRE 11+)
-- **Purpose**: Advanced LibreOffice features (PDF generation)
-- **Ubuntu/Debian**: `sudo apt install default-jre`
-- **macOS**: `brew install openjdk`
-- **Windows**: [Download from adoptium.net](https://adoptium.net/)
-
 ## 🚀 Quick Setup Commands
 
 ### Ubuntu/Debian
@@ -44,7 +38,7 @@ sudo apt install libreoffice python3.12 python3.12-venv curl
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Optional components
-sudo apt install nodejs npm default-jre
+sudo apt install nodejs npm
 ```
 
 ### macOS (with Homebrew)
@@ -55,7 +49,7 @@ brew install python@3.12
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Optional components
-brew install node openjdk
+brew install node
 ```
 
 ### Windows (with Chocolatey)
@@ -65,7 +59,7 @@ choco install libreoffice python312
 # Then install UV manually from the website
 
 # Optional components
-choco install nodejs openjdk
+choco install nodejs
 ```
 
 ## 🔍 Verification Commands
@@ -86,8 +80,6 @@ uv --version
 node --version
 npm --version
 
-# Check Java (optional)
-java -version
 ```
 
 ## 🛠 Helper Script
@@ -101,8 +93,14 @@ Use the included helper script for automated checking:
 # Check your system
 ./mcp-helper.sh check
 
-# Test functionality
-./mcp-helper.sh test
+# Run automated tests
+uv run pytest -q
+
+# Exercise the real stdio transport
+uv run pytest -q tests/test_stdio_protocol.py
+
+# Run the LibreOffice smoke test (keeps artifacts in test-output/)
+uv run python src/main.py --test
 ```
 
 ## 💾 System Requirements
@@ -116,7 +114,7 @@ Use the included helper script for automated checking:
 
 - **Claude Desktop**: Direct MCP protocol
 - **Super Assistant**: Chrome extension via proxy
-- **Custom Clients**: Python FastMCP framework
+- **Custom Clients**: Python MCP SDK
 
 ---
 

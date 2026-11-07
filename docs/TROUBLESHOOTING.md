@@ -19,7 +19,7 @@ Error executing tool insert_text_at_position: Failed to insert text: Document co
 **To verify the fix works**:
 ```bash
 # Run the test script
-uv run python test_insert_fix.py
+uv run pytest -q tests/test_insert_fix.py
 
 # Or test specific functionality
 ./mcp-helper.sh test
@@ -104,19 +104,12 @@ Error: source file could not be loaded
 ```
 
 **✅ Solutions**:
-1. **Install Java** (optional but recommended):
-   ```bash
-   # Ubuntu/Debian
-   sudo apt install default-jre
-   
-   # macOS
-   brew install openjdk
-   
-   # Verify
-   java -version
-   ```
-
-2. **Continue without Java**: Basic functionality works without Java, only PDF generation may be limited.
+Java warnings are usually independent of conversion failures. Run the smoke test
+from the repository so output is written to `test-output/`, then inspect its
+LibreOffice error output:
+```bash
+uv run python src/main.py --test
+```
 
 ### ❌ Error: "MCP server not responding"
 
@@ -130,7 +123,7 @@ Error: source file could not be loaded
    cat ~/.config/claude/claude_desktop_config.json
    
    # Verify the server path is correct
-   ls -la <PATH_TO>/mcp-libre/main.py
+   ls -la <PATH_TO>/mcp-libre/src/main.py
    ```
 
 2. **For Super Assistant**:
@@ -175,16 +168,17 @@ Error: source file could not be loaded
 
 ### Test Insert Function Specifically
 ```bash
-uv run python test_insert_fix.py
+uv run pytest -q tests/test_insert_fix.py
 ```
 
 ## Debug Mode
 
 To get more detailed error information:
 
-1. **Run server with debug output**:
+1. **Run the server or its stdio protocol test**:
    ```bash
-   PYTHONPATH=<PATH_TO>/mcp-libre uv run python main.py --verbose
+   uv run python src/main.py
+   uv run pytest -q tests/test_stdio_protocol.py
    ```
 
 2. **Check LibreOffice directly**:

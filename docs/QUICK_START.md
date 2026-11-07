@@ -2,18 +2,22 @@
 
 ## Setup Commands (Run in Terminal)
 
-1. **Check if everything is ready:**
+1. **Install dependencies and check the environment:**
    ```bash
+   cd <PATH_TO>/mcp-libre
+   uv sync
    <PATH_TO>/mcp-libre/mcp-helper.sh check
    ```
 
-2. **Test the LibreOffice MCP server:**
+2. **Run the automated and stdio tests:**
    ```bash
-   <PATH_TO>/mcp-libre/mcp-helper.sh test
+   uv run pytest -q
+   uv run pytest -q tests/test_stdio_protocol.py
    ```
 
-3. **Start the MCP proxy for Super Assistant:**
+3. **Run the LibreOffice smoke test or start the proxy:**
    ```bash
+   uv run python src/main.py --test
    <PATH_TO>/mcp-libre/mcp-helper.sh proxy
    ```
 

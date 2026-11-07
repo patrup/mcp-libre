@@ -31,6 +31,8 @@ mcp-libre/
 │   ├── __init__.py                 # Test package initialization
 │   ├── test_client.py              # Interactive MCP client test
 │   └── test_insert_fix.py          # Specific function tests
+│   └── test_stdio_protocol.py       # Real MCP stdio protocol test
+├── 📁 test-output/                  # Preserved smoke and integration artifacts
 ├── 📁 examples/                    # Demo and example scripts
 │   ├── __init__.py                 # Examples package initialization
 │   ├── demo_editing.py             # Document editing demonstrations
@@ -133,8 +135,11 @@ For convenience, wrapper scripts are provided in the root directory:
 # Run the MCP server directly
 uv run python src/main.py
 
-# Run tests
-uv run python tests/test_client.py
+# Run all tests
+uv run pytest -q
+
+# Test the actual stdio server process
+uv run pytest -q tests/test_stdio_protocol.py
 
 # Run examples
 uv run python examples/demo_editing.py
@@ -164,10 +169,10 @@ The `pyproject.toml` file is configured for the new structure:
 mcp-libre = "src.libremcp:main"
 ```
 
-This allows the package to be installed and run as:
+This allows the installed command to run the external MCP SDK 2.x server:
 ```bash
-uv pip install -e .  # Install in development mode
-mcp-libre             # Run the installed script
+uv sync
+mcp-libre
 ```
 
 ## 🔍 Path Management

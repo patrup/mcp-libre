@@ -54,9 +54,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# UV package manager
-uv.lock
-
 # Python SDK (external dependency)
 python-sdk/
 
@@ -104,3 +101,5 @@ local_config.json
 # MCP specific
 mcp_test_*
 temp_documents/
+test-output/*
+!test-output/.gitkeep

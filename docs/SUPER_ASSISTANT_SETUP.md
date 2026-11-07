@@ -41,7 +41,7 @@ The generated configuration will include both servers (if you have Blender MCP i
         	"args": [
             	"run",
             	"python",
-            	"/your/actual/path/to/mcp-libre/main.py"
+            "/your/actual/path/to/mcp-libre/src/main.py"
         	],
         	"cwd": "/your/actual/path/to/mcp-libre",
         	"env": {

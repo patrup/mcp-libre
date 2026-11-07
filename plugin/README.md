@@ -2,7 +2,9 @@
 
 ## 🎯 Overview
 
-The LibreOffice MCP Extension integrates Model Context Protocol (MCP) server functionality directly into LibreOffice, enabling AI assistants to interact with LibreOffice documents in real-time through direct UNO API access.
+The LibreOffice MCP Extension is a separate embedded HTTP/UNO integration for
+LibreOffice. It is not the external MCP SDK stdio server; start that server with
+`uv run python src/main.py` from the repository root.
 
 ## 🚀 Key Features
 
