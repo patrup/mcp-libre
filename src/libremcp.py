@@ -8,7 +8,9 @@ and other LibreOffice formats.
 
 import asyncio
 import json
+import socket
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -97,6 +99,192 @@ def _get_document_info(file_path: str) -> DocumentInfo:
     )
 
 
+def _find_uno_python() -> Optional[str]:
+    """Return a Python interpreter that can import LibreOffice's UNO bindings."""
+    candidates = [sys.executable, "/usr/bin/python3"]
+    seen = set()
+
+    for candidate in candidates:
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+
+        try:
+            result = subprocess.run(
+                [candidate, "-c", "import uno"],
+                capture_output=True,
+                timeout=5,
+                check=False,
+            )
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            continue
+
+        if result.returncode == 0:
+            return candidate
+
+    return None
+
+
+def _find_available_port() -> int:
+    """Reserve an ephemeral local port long enough to determine its number."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        listener.bind(("127.0.0.1", 0))
+        return listener.getsockname()[1]
+
+
+def _create_document_with_uno(path: Path, doc_type: str, content: str) -> None:
+    """Create, save, and close an ODF document through a private UNO process."""
+    uno_python = _find_uno_python()
+    if uno_python is None:
+        raise RuntimeError(
+            "LibreOffice UNO Python bindings are unavailable. Install the "
+            "python3-uno package provided by your LibreOffice installation."
+        )
+
+    port = _find_available_port()
+    profile_directory = tempfile.TemporaryDirectory()
+    script_path = None
+    process = None
+    try:
+        profile_url = Path(profile_directory.name).as_uri()
+        executable = next(
+            (
+                candidate
+                for candidate in ("libreoffice", "loffice", "soffice")
+                if _command_exists(candidate)
+            ),
+            None,
+        )
+        if executable is None:
+            raise FileNotFoundError("LibreOffice executable not found. Please install LibreOffice.")
+
+        process = subprocess.Popen(
+            [
+                executable,
+                "--headless",
+                "--nologo",
+                "--nodefault",
+                "--nolockcheck",
+                "--norestore",
+                f"--accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager",
+                f"-env:UserInstallation={profile_url}",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        script = """
+import json
+import sys
+import time
+from pathlib import Path
+
+import uno
+from com.sun.star.beans import PropertyValue
+
+config = json.load(sys.stdin)
+context = uno.getComponentContext()
+resolver = context.ServiceManager.createInstanceWithContext(
+    "com.sun.star.bridge.UnoUrlResolver", context
+)
+connection_url = (
+    "uno:socket,host=127.0.0.1,port={port};urp;StarOffice.ComponentContext"
+).format(port=config["port"])
+
+for _ in range(100):
+    try:
+        remote_context = resolver.resolve(connection_url)
+        break
+    except Exception:
+        time.sleep(0.1)
+else:
+    raise RuntimeError("Timed out connecting to LibreOffice UNO")
+
+desktop = remote_context.ServiceManager.createInstanceWithContext(
+    "com.sun.star.frame.Desktop", remote_context
+)
+factories = {
+    "writer": "private:factory/swriter",
+    "calc": "private:factory/scalc",
+    "impress": "private:factory/simpress",
+    "draw": "private:factory/sdraw",
+}
+filters = {
+    "writer": "writer8",
+    "calc": "calc8",
+    "impress": "impress8",
+    "draw": "draw8",
+}
+document = desktop.loadComponentFromURL(factories[config["doc_type"]], "_blank", 0, ())
+try:
+    if config["content"]:
+        if config["doc_type"] == "writer":
+            document.getText().setString(config["content"])
+        elif config["doc_type"] == "calc":
+            document.getSheets().getByIndex(0).getCellByPosition(0, 0).setString(
+                config["content"]
+            )
+        elif config["doc_type"] == "impress":
+            page = document.getDrawPages().getByIndex(0)
+            shape = document.createInstance("com.sun.star.drawing.TextShape")
+            shape.setString(config["content"])
+            page.add(shape)
+
+    filter_name = PropertyValue()
+    filter_name.Name = "FilterName"
+    filter_name.Value = filters[config["doc_type"]]
+    overwrite = PropertyValue()
+    overwrite.Name = "Overwrite"
+    overwrite.Value = True
+    document.storeAsURL(Path(config["path"]).as_uri(), (filter_name, overwrite))
+finally:
+    document.close(True)
+"""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as script_file:
+            script_file.write(script)
+            script_path = script_file.name
+
+        result = subprocess.run(
+            [uno_python, script_path],
+            input=json.dumps({"path": str(path.absolute()), "doc_type": doc_type, "content": content, "port": port}),
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                "LibreOffice UNO document creation failed: "
+                f"{result.stderr.strip() or result.stdout.strip()}"
+            )
+    except subprocess.TimeoutExpired as error:
+        raise TimeoutError("LibreOffice UNO document creation timed out after 30 seconds") from error
+    finally:
+        if script_path:
+            Path(script_path).unlink(missing_ok=True)
+        if process is not None:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        profile_directory.cleanup()
+
+
+def _command_exists(command: str) -> bool:
+    """Check whether an executable can be resolved without invoking a shell."""
+    try:
+        subprocess.run(
+            [command, "--version"],
+            capture_output=True,
+            timeout=5,
+            check=False,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+    return True
+
+
 # Core LibreOffice Tools
 
 @mcp.tool()
@@ -160,58 +348,10 @@ def create_document(path: str, doc_type: str = "writer", content: str = "") -> D
                 # Clean up temporary file
                 Path(tmp_path).unlink(missing_ok=True)
         else:
-            # For other document types or empty documents, try LibreOffice template creation
-            try:
-                # Try using LibreOffice to create an empty document
-                template_map = {
-                    "writer": "--writer",
-                    "calc": "--calc", 
-                    "impress": "--impress",
-                    "draw": "--draw"
-                }
-                
-                # Create using LibreOffice command line
-                result = _run_libreoffice_command([
-                    '--headless',
-                    '--invisible',
-                    '--nodefault',
-                    '--nolockcheck',
-                    '--nologo',
-                    '--norestore',
-                    '--convert-to', format_map[doc_type].lstrip('.'),
-                    '--outdir', str(path_obj.parent),
-                    '/dev/null'  # Convert from nothing to create empty document
-                ])
-                
-                # If that doesn't work, create minimal file structure
-                if not path_obj.exists():
-                    if doc_type == "writer":
-                        # Create minimal ODT
-                        import zipfile
-                        with zipfile.ZipFile(path_obj, 'w', zipfile.ZIP_DEFLATED) as zf:
-                            zf.writestr('mimetype', 'application/vnd.oasis.opendocument.text')
-                            manifest = '''<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
- <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/>
- <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>'''
-                            zf.writestr('META-INF/manifest.xml', manifest)
-                            content_xml = '''<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
- <office:body>
-  <office:text>
-   <text:p></text:p>
-  </office:text>
- </office:body>
-</office:document-content>'''
-                            zf.writestr('content.xml', content_xml)
-                    else:
-                        # For other formats, create empty file
-                        path_obj.touch()
-                        
-            except Exception as e:
-                # Fallback: create empty file
-                path_obj.touch()
+            if doc_type == "writer":
+                _create_minimal_odt(path_obj, content)
+            else:
+                _create_document_with_uno(path_obj, doc_type, content)
         
         return _get_document_info(str(path_obj))
         
